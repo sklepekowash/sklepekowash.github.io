@@ -115,7 +115,6 @@ textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,m
   <span class="total-big" id="grandTotal">0,00 zł</span>
 </footer>
 
-<!-- Modal do zarządzania kategoriami -->
 <div class="modal" id="categoryModal">
   <div class="modal-content">
     <h2 id="modalTitle">Edytuj kategorię</h2>
@@ -133,10 +132,19 @@ textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,m
 const BASE_CATALOG = [{"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta M14x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-18GW", "name": "GUEST 6mm Złączka prosta M18x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-TE", "name": "GUEST 6mm Złączka T", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-TR", "name": "GUEST 6mm Złączka trójnik redukcja", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZAK", "name": "GUEST 6mm Złączka zaślepka", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR", "name": "GUEST 4mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR-14GW", "name": "GUEST 4mm Złączka prosta M14x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR-18GW", "name": "GUEST 4mm Złączka prosta M18x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-TE", "name": "GUEST 4mm Złączka T", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-TR", "name": "GUEST 4mm Złączka trójnik redukcja", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZAK", "name": "GUEST 4mm Złączka zaślepka", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GWINTY-M14-1.5", "name": "Gwinty GU M14x1.5", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GWINTY-M18-1.5", "name": "Gwinty GU M18x1.5", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "POMPA-12V", "name": "Pompa 12V 100W", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "POMPA-24V", "name": "Pompa 24V 100W", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "SILNIK-12V", "name": "Silnik 12V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "SILNIK-24V", "name": "Silnik 24V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "CZUJNIK-TEMP", "name": "Czujnik temperatury DS18B20", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "CZUJNIK-PRZEP", "name": "Czujnik przepływu", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "PRZEK-RELAY-12V", "name": "Przekaźnik/Relay 12V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "PRZEK-RELAY-24V", "name": "Przekaźnik/Relay 24V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "ZAWOREK-ZPOW", "name": "Zawór zwrotny (powietrze)", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ZAWOREK-ZAM", "name": "Zawór zamykający", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-PLASKI", "name": "Rozpylacz płaski", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-STORCZYK", "name": "Rozpylacz storczykowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-MGLA", "name": "Rozpylacz mgła", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-PIANA", "name": "Rozpylacz pianka", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-WIROWY", "name": "Rozpylacz wirowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-SZCZELINOWY", "name": "Rozpylacz szczelinowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZDZIELACZ", "name": "Rozdzielacz", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-50L", "name": "Zbiornik 50L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-100L", "name": "Zbiornik 100L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-150L", "name": "Zbiornik 150L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-200L", "name": "Zbiornik 200L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "KRZAN-KULOWY", "name": "Krzan kulowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "FILTR-OBIEGOWY", "name": "Filtr obiegowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "FILTR-PRZYSUCKOWY", "name": "Filtr przysiuckowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "GRZALKA-3KW", "name": "Grzałka 3kW", "stage": "5. Grzanie i osuszanie"}, {"code": "GRZALKA-6KW", "name": "Grzałka 6kW", "stage": "5. Grzanie i osuszanie"}, {"code": "GRZALKA-9KW", "name": "Grzałka 9kW", "stage": "5. Grzanie i osuszanie"}, {"code": "TERMOSTAT", "name": "Termostat", "stage": "5. Grzanie i osuszanie"}, {"code": "OSUSZACZ", "name": "Osuszacz", "stage": "5. Grzanie i osuszanie"}, {"code": "SEPARATOR-PARY", "name": "Separator pary", "stage": "5. Grzanie i osuszanie"}, {"code": "RURA-SILIKONOWA", "name": "Rura silikonowa", "stage": "6. Akcesoria i dodatki"}, {"code": "RURA-ELASTYCZNA", "name": "Rura elastyczna", "stage": "6. Akcesoria i dodatki"}, {"code": "ADAPTER-10", "name": "Adapter 10mm", "stage": "6. Akcesoria i dodatki"}, {"code": "ADAPTER-14", "name": "Adapter 14mm", "stage": "6. Akcesoria i dodatki"}, {"code": "SPINKA-METALOWA", "name": "Spinka metalowa do rury", "stage": "6. Akcesoria i dodatki"}, {"code": "USZCZELKA", "name": "Uszczelka", "stage": "6. Akcesoria i dodatki"}, {"code": "OLEJ-BIODEGRADOWALNY", "name": "Olej biodegradowalny", "stage": "6. Akcesoria i dodatki"}, {"code": "OLEJ-MINERALNY", "name": "Olej mineralny", "stage": "6. Akcesoria i dodatki"}];
 const STATIONS = [2,3,4,5,6];
 let currentStation = 4;
-let view = 'stage'; // 'stage' | 'summary' | 'cennik' | 'uwagi'
+let view = 'stage';
 let currentStage = null;
-let modalMode = null; // 'add' | 'edit'
-let modalEditName = null; // nazwa kategorii do edycji
+let modalMode = null;
+let modalEditName = null;
+
+const STORAGE_VERSION = 'ekowash-v2';
+const storedVersion = localStorage.getItem('ekw_storage_version');
+if (storedVersion !== STORAGE_VERSION) {
+  Object.keys(localStorage)
+    .filter(key => key.indexOf('ekw_') === 0 || key === 'ekw_storage_version')
+    .forEach(key => localStorage.removeItem(key));
+  localStorage.setItem('ekw_storage_version', STORAGE_VERSION);
+}
 
 function lsGet(key, fallback){
   try{ const v = localStorage.getItem(key); return v===null?fallback:JSON.parse(v); }catch(e){ return fallback; }
@@ -144,9 +152,9 @@ function lsGet(key, fallback){
 function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
 
 let prices = lsGet('ekw_prices', {});
-let customItems = lsGet('ekw_custom', []); // [{code,name,stage}]
-let stageOverride = lsGet('ekw_stage_override', {}); // code -> stage name
-let extraStages = lsGet('ekw_extra_stages', []); // puste kategorie utworzone recznie
+let customItems = lsGet('ekw_custom', []);
+let stageOverride = lsGet('ekw_stage_override', {});
+let extraStages = lsGet('ekw_extra_stages', []);
 let boms = {}; STATIONS.forEach(s=>boms[s]=lsGet('ekw_bom_'+s, {}));
 let notes = {}; STATIONS.forEach(s=>notes[s]=lsGet('ekw_notes_'+s, ''));
 
@@ -213,7 +221,6 @@ function moveItem(code, newStage){
   saveOverride(); render();
 }
 
-// Otwórz modal do edycji kategorii
 function openEditCategoryModal(oldName){
   modalMode = 'edit';
   modalEditName = oldName;
@@ -225,7 +232,6 @@ function openEditCategoryModal(oldName){
   setTimeout(() => document.getElementById('categoryInput').focus(), 100);
 }
 
-// Otwórz modal do dodania nowej kategorii
 function openAddCategoryModal(){
   modalMode = 'add';
   modalEditName = null;
@@ -237,14 +243,12 @@ function openAddCategoryModal(){
   setTimeout(() => document.getElementById('categoryInput').focus(), 100);
 }
 
-// Zamknij modal
 function closeCategoryModal(){
   document.getElementById('categoryModal').classList.remove('active');
   modalMode = null;
   modalEditName = null;
 }
 
-// Zapisz edytowaną lub nową kategorię
 function saveCategoryEdit(){
   const newName = document.getElementById('categoryInput').value.trim();
   if(!newName){
@@ -259,9 +263,7 @@ function saveCategoryEdit(){
       closeCategoryModal();
       return;
     }
-    // Zmień nazwę dla wszystkich pozycji
     allItems().forEach(i=>{ if(effStage(i)===oldName) stageOverride[i.code] = newName; });
-    // Zmień w extraStages jeśli istnieje
     const ei = extraStages.indexOf(oldName);
     if(ei>-1){ extraStages[ei] = newName; saveExtra(); }
     saveOverride();
@@ -281,31 +283,28 @@ function saveCategoryEdit(){
   render();
 }
 
-// Potwierdź usunięcie kategorii
 function confirmDeleteCategory(){
   const oldName = modalEditName;
   if(!confirm(`Usunąć kategorię "${oldName}"?\n\nWszystkie pozycje z tej kategorii nie będą usunięte, ale zostaną przypisane do domyślnych kategorii.`)){
     return;
   }
-  
-  // Usuń kategorię z extraStages
+
   const ei = extraStages.indexOf(oldName);
   if(ei>-1){
     extraStages.splice(ei, 1);
     saveExtra();
   }
-  
-  // Usuń overrides dla tej kategorii
+
   const itemsToUpdate = allItems().filter(i=>effStage(i)===oldName);
   itemsToUpdate.forEach(i=>{
     if(stageOverride[i.code]) delete stageOverride[i.code];
   });
   saveOverride();
-  
+
   if(currentStage === oldName){
     currentStage = allStages()[0] || 'Brak';
   }
-  
+
   closeCategoryModal();
   render();
 }
@@ -457,7 +456,6 @@ function applyCennik(){
   render();
 }
 
-// Szybkie usunięcie kategorii (dla niestandardowych)
 function deleteCategoryQuick(name){
   openEditCategoryModal(name);
 }
