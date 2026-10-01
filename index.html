@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>EkoWash — Spis myjni</title>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f7f8fa;color:#1a1d23;margin:0;padding:24px;text-align:center}main{max-width:700px;margin:10vh auto;background:#fff;border:1px solid #e3e6ea;border-radius:10px;padding:24px}p{color:#6b7280} .error{color:#c0392b}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>EkoWash — Spis myjni</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f7f8fa;color:#1a1d23;margin:0;padding:24px;text-align:center}
+    main{max-width:700px;margin:10vh auto}
+    .error{color:#c0392b}
+  </style>
 </head>
 <body>
-<main id="loader"><h1>EkoWash</h1><p>Ładowanie katalogu materiałów…</p></main>
-<script>
-(async function(){
-  const appUrl='https://raw.githubusercontent.com/sklepekowash/sklepekowash.github.io/1acd31f175bc603756c7953905ef05b63ebeb08a/index.html';
-  const catalogUrl='https://raw.githubusercontent.com/sklepekowash/sklepekowash.github.io/8c5959ad0d20786a359bd008b306a5b4578faf8a/EkoWash%20%E2%80%94%20Spis%20materia%C5%82owy%20myjni.html';
-  try{
-    const [appResponse,catalogResponse]=await Promise.all([fetch(appUrl),fetch(catalogUrl)]);
-    if(!appResponse.ok||!catalogResponse.ok) throw new Error('Nie udało się pobrać plików aplikacji.');
-    const [app,catalogSource]=await Promise.all([appResponse.text(),catalogResponse.text()]);
-    const catalogMatch=catalogSource.match(/const BASE_CATALOG = (\\[[\\s\\S]*?\\]);\\s*const STATIONS/);
-    if(!catalogMatch) throw new Error('Nie znaleziono katalogu produktów.');
-    const restored=app.replace(/const BASE_CATALOG = \\[\\s\\S]*?\\];\\s*const STATIONS/,`const BASE_CATALOG = ${catalogMatch[1]};\nconst STATIONS`);
-    if(restored===app) throw new Error('Nie udało się przywrócić katalogu produktów.');
-    document.open();
-    document.write(restored);
-    document.close();
-  }catch(error){
-    document.getElementById('loader').innerHTML='<h1>EkoWash</h1><p class="error">'+error.message+'</p><p>Odśwież stronę, aby spróbować ponownie.</p>';
-  }
-})();
-</script>
+  <main id="loader"><h1>EkoWash</h1><p>Ładowanie katalogu materiałów…</p></main>
+  <script>
+  (async function(){
+    // Ładujemy kompletną, niezmienną wersję aplikacji. Nie składamy katalogu
+    // z drugiego pliku, dzięki czemu GitHub Pages nie pokazuje starej wersji.
+    const appUrl='https://raw.githubusercontent.com/sklepekowash/sklepekowash.github.io/1acd31f175bc603756c7953905ef05b63ebeb08a/index.html?catalog=full';
+    try{
+      const response=await fetch(appUrl,{cache:'no-store'});
+      if(!response.ok) throw new Error('Nie udało się pobrać pełnej aplikacji.');
+      const app=await response.text();
+      if(!app.includes('const BASE_CATALOG') || !app.includes('const STATIONS')) throw new Error('Pobrany plik nie zawiera pełnego katalogu.');
+      document.open();
+      document.write(app);
+      document.close();
+    }catch(error){
+      document.getElementById('loader').innerHTML='<h1>EkoWash</h1><p class="error">'+error.message+'</p><p>Odśwież stronę, aby spróbować ponownie.</p>';
+    }
+  })();
+  </script>
 </body>
 </html>
