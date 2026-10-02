@@ -115,6 +115,7 @@
       width: 100%; max-width: 110px; padding: 6px 8px;
       border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--text);
     }
+    .code-input { max-width: 120px; font-family: Consolas, monospace; }
     .qty-input { max-width: 70px; }
     select {
       width: 100%; max-width: 180px; padding: 6px 8px; border-radius: 6px;
@@ -150,6 +151,40 @@
     .hint { color: var(--muted); font-size: 12px; }
     .danger { color: var(--warn); background: transparent; border: none; font-size: 18px; cursor: pointer; }
 
+    .stage-actions {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .stage-actions button {
+      border: none; background: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
+      border-radius: 4px; transition: background 0.2s;
+    }
+    .stage-actions button:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white; border-radius: 12px; padding: 24px; max-width: 400px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+    .modal-content input {
+      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; font-size: 14px;
+    }
+    .modal-buttons {
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+    .modal-buttons button {
+      border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 700;
+    }
+    .modal-buttons .nav-btn { background: var(--accent); color: white; }
+    .modal-buttons .secondary-btn { background: var(--border); color: var(--text); }
+
     @media (max-width: 700px) {
       table, thead, tbody, th, td, tr { display: block; }
       thead { display: none; }
@@ -179,9 +214,33 @@
     <span id="grandTotal" class="grand-total">0,00 zł</span>
   </footer>
 
+  <!-- Modal do edycji kodu produktu -->
+  <div id="editCodeModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Zmień kod produktu</h3>
+      <input id="editCodeInput" type="text" placeholder="Nowy kod" />
+      <div class="modal-buttons">
+        <button class="secondary-btn" onclick="closeEditCodeModal()">Anuluj</button>
+        <button class="nav-btn" onclick="saveEditCode()">Zapisz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do edycji kategorii -->
+  <div id="editCategoryModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Zmień kategorię</h3>
+      <input id="editCategoryInput" type="text" placeholder="Nowa nazwa kategorii" />
+      <div class="modal-buttons">
+        <button class="secondary-btn" onclick="closeEditCategoryModal()">Anuluj</button>
+        <button class="nav-btn" onclick="saveEditCategory()">Zapisz</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const STATIONS = [2, 3, 4, 5, 6];
-    const STORAGE_VERSION = 'ekowash-v2';
+    const STORAGE_VERSION = 'ekowash-v3';
 
     const BASE_CATALOG = [
       { code: 'GUE06-ZPR', name: 'GUEST 6mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
@@ -201,7 +260,7 @@
       { code: 'PAN-KPL', name: 'Panel stanowiska', stage: '4. Panel i pulpit' },
       { code: 'PAN-DRZ', name: 'Drzwi pulpitu', stage: '4. Panel i pulpit' },
       { code: 'RWM-STD', name: 'Rozmieniarka standard', stage: '10. Rozmieniarka' },
-      { code: 'WEZ06-STC', name: 'Wąż stanowiskowy DN6', stage: '2. Węże' },
+      { code: 'WEZ06-STC', name: 'Wą�� stanowiskowy DN6', stage: '2. Węże' },
       { code: 'WEZ08-STC', name: 'Wąż stanowiskowy DN8', stage: '2. Węże' }
     ];
 
@@ -214,6 +273,11 @@
     let extraStages = [];
     let boms = {};
     let notes = {};
+    let codeMapping = {}; // Mapowanie starych kodów na nowe
+
+    // Zmienne dla modalów
+    let editingItemCode = null;
+    let editingCategoryName = null;
 
     function safeStorageGet(key, fallback) {
       try {
@@ -265,6 +329,7 @@
       customItems = safeStorageGet('ekw_custom', []);
       stageOverride = safeStorageGet('ekw_stage_override', {});
       extraStages = safeStorageGet('ekw_extra_stages', []);
+      codeMapping = safeStorageGet('ekw_code_mapping', {});
 
       STATIONS.forEach(station => {
         boms[station] = safeStorageGet('ekw_bom_' + station, {});
@@ -277,6 +342,7 @@
       safeStorageSet('ekw_custom', customItems);
       safeStorageSet('ekw_stage_override', stageOverride);
       safeStorageSet('ekw_extra_stages', extraStages);
+      safeStorageSet('ekw_code_mapping', codeMapping);
 
       STATIONS.forEach(station => {
         safeStorageSet('ekw_bom_' + station, boms[station]);
@@ -364,21 +430,109 @@
       render();
     }
 
-    function renameStage(oldName) {
-      const newName = prompt('Nowa nazwa kategorii:', oldName);
-      if (!newName || !newName.trim()) return;
-      const clean = newName.trim();
-      if (clean === oldName) return;
+    function openEditCategoryModal(oldName) {
+      editingCategoryName = oldName;
+      const input = document.getElementById('editCategoryInput');
+      input.value = oldName;
+      document.getElementById('editCategoryModal').classList.add('active');
+      input.focus();
+    }
+
+    function closeEditCategoryModal() {
+      document.getElementById('editCategoryModal').classList.remove('active');
+      editingCategoryName = null;
+    }
+
+    function saveEditCategory() {
+      const newName = document.getElementById('editCategoryInput').value.trim();
+      if (!newName || newName === editingCategoryName) {
+        closeEditCategoryModal();
+        return;
+      }
 
       allItems().forEach(item => {
-        if (effectiveStage(item) === oldName) stageOverride[item.code] = clean;
+        if (effectiveStage(item) === editingCategoryName) stageOverride[item.code] = newName;
       });
 
-      const idx = extraStages.indexOf(oldName);
-      if (idx >= 0) extraStages[idx] = clean;
-      if (currentStage === oldName) currentStage = clean;
+      const idx = extraStages.indexOf(editingCategoryName);
+      if (idx >= 0) extraStages[idx] = newName;
+      if (currentStage === editingCategoryName) currentStage = newName;
+      saveState();
+      closeEditCategoryModal();
+      render();
+    }
+
+    function deleteCategory(categoryName) {
+      if (!confirm('Usunąć kategorię "' + categoryName + '"?\n\nProdukty będą przeniesione do kategorii domyślnej.')) return;
+
+      const defaultStage = BASE_CATALOG[0]?.stage || '1. Instalacja hydrauliczna';
+      allItems().forEach(item => {
+        if (effectiveStage(item) === categoryName) delete stageOverride[item.code];
+      });
+
+      const idx = extraStages.indexOf(categoryName);
+      if (idx >= 0) extraStages.splice(idx, 1);
+      if (currentStage === categoryName) currentStage = defaultStage;
       saveState();
       render();
+    }
+
+    function openEditCodeModal(code) {
+      editingItemCode = code;
+      const input = document.getElementById('editCodeInput');
+      input.value = code;
+      document.getElementById('editCodeModal').classList.add('active');
+      input.focus();
+      input.select();
+    }
+
+    function closeEditCodeModal() {
+      document.getElementById('editCodeModal').classList.remove('active');
+      editingItemCode = null;
+    }
+
+    function saveEditCode() {
+      const newCode = document.getElementById('editCodeInput').value.trim();
+      if (!newCode || newCode === editingItemCode) {
+        closeEditCodeModal();
+        return;
+      }
+
+      if (allItems().some(item => item.code === newCode)) {
+        alert('Kod "' + newCode + '" już istnieje!');
+        return;
+      }
+
+      // Zaktualizuj kod
+      const item = allItems().find(i => i.code === editingItemCode);
+      if (item) {
+        item.code = newCode;
+        // Przenies cenę
+        if (editingItemCode in prices) {
+          prices[newCode] = prices[editingItemCode];
+          delete prices[editingItemCode];
+        }
+        // Przenies stage override
+        if (editingItemCode in stageOverride) {
+          stageOverride[newCode] = stageOverride[editingItemCode];
+          delete stageOverride[editingItemCode];
+        }
+        // Przenies BOM dla wszystkich stacji
+        STATIONS.forEach(station => {
+          if (boms[station][editingItemCode]) {
+            boms[station][newCode] = boms[station][editingItemCode];
+            delete boms[station][editingItemCode];
+          }
+        });
+        codeMapping[editingItemCode] = newCode;
+        saveState();
+        closeEditCodeModal();
+        render();
+      }
+    }
+
+    function renameStage(oldName) {
+      openEditCategoryModal(oldName);
     }
 
     function deleteCustom(code) {
@@ -397,13 +551,23 @@
       const nameInput = document.getElementById('newName');
       const qtyInput = document.getElementById('newQty');
       const priceInput = document.getElementById('newPrice');
+      const codeInput = document.getElementById('newCode');
       const name = (nameInput.value || '').trim();
+      const customCode = (codeInput.value || '').trim();
+
       if (!name) {
         nameInput.focus();
         return;
       }
 
-      const code = 'WLASNY-' + Date.now();
+      const code = customCode || 'WLASNY-' + Date.now();
+      
+      // Sprawdź czy kod już istnieje
+      if (allItems().some(item => item.code === code)) {
+        alert('Kod "' + code + '" już istnieje!');
+        return;
+      }
+
       customItems.push({ code, name, stage: stageName });
       prices[code] = Number(priceInput.value) || 0;
       const entry = getItemEntry(station, code);
@@ -413,6 +577,7 @@
       nameInput.value = '';
       qtyInput.value = '1';
       priceInput.value = '';
+      codeInput.value = '';
       saveState();
       render();
     }
@@ -450,13 +615,18 @@
 
     function renderStageNavigation() {
       const stages = allStages();
+      const isExtraStage = extraStages.includes(currentStage);
       const buttons = stages.map(stageName => {
         const active = stageName === currentStage && view === 'stage';
         const done = hasStageItems(currentStation, stageName);
+        const isExtra = extraStages.includes(stageName);
         return `
           <span class="stage-chip ${active ? 'active' : ''} ${done ? 'done' : ''}">
             <span onclick="selectStage('${stageName.replace(/'/g, "\\'")}' )">${stageName}</span>
-            <span onclick="renameStage('${stageName.replace(/'/g, "\\'")}')" title="Zmień nazwę">✎</span>
+            <div class="stage-actions">
+              <button onclick="renameStage('${stageName.replace(/'/g, "\\'")}')" title="Zmień nazwę">✎</button>
+              ${isExtra ? `<button onclick="deleteCategory('${stageName.replace(/'/g, "\\'")}')" title="Usuń kategorię">🗑️</button>` : ''}
+            </div>
           </span>
         `;
       }).join('');
@@ -485,7 +655,7 @@
         return `
           <tr class="${entry.active ? '' : 'inactive'}">
             <td data-label="Aktywne"><input type="checkbox" ${entry.active ? 'checked' : ''} onchange="toggleActive(${currentStation}, '${item.code}', this.checked)"></td>
-            <td data-label="Kod" class="code">${isCustom ? '✏️ ' : ''}${item.code}</td>
+            <td data-label="Kod" class="code" style="cursor: pointer; user-select: none;" onclick="openEditCodeModal('${item.code}');" title="Kliknij, aby edytować">${isCustom ? '✏️ ' : ''}${item.code}</td>
             <td data-label="Nazwa">${item.name}</td>
             <td data-label="Kategoria">
               <select onchange="moveItem('${item.code}', this.value)">
@@ -527,7 +697,8 @@
           </div>
 
           <div class="add-form">
-            <input id="newName" type="text" placeholder="Nazwa własnego produktu" />
+            <input id="newCode" type="text" placeholder="Kod (opcjonalnie)" class="code-input" />
+            <input id="newName" type="text" placeholder="Nazwa produktu" />
             <input id="newQty" type="number" min="0" value="1" />
             <input id="newPrice" type="number" min="0" step="0.01" placeholder="Cena" />
             <button class="secondary-btn" onclick="addCustomItem(${currentStation}, '${currentStage.replace(/'/g, "\\'")}')">+ Dodaj do etapu</button>
