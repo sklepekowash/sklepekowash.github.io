@@ -100,109 +100,140 @@ textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,m
   <span id="stageLabel" style="color:var(--muted); font-size:12px;"></span>
   <span class="total-big" id="grandTotal">0,00 zł</span>
 </footer>
-
 <script>
 const BASE_CATALOG = [
-  {"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE06-ZPR-12GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE08-ZPR", "name": "GUEST 8mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE08-ZPR-12GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE08-ZPR-34GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE10-ZPR", "name": "GUEST 10mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE10-ZPR-12GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE10-ZPR-34GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE12-ZPR", "name": "GUEST 12mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE12-ZPR-12GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE12-ZPR-34GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE16-ZPR", "name": "GUEST 16mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE16-ZPR-12GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE16-ZPR-34GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE20-ZPR", "name": "GUEST 20mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE20-ZPR-12GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE20-ZPR-34GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE25-ZPR", "name": "GUEST 25mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE25-ZPR-12GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE25-ZPR-34GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE32-ZPR", "name": "GUEST 32mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE32-ZPR-12GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE32-ZPR-34GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE40-ZPR", "name": "GUEST 40mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE40-ZPR-12GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE40-ZPR-34GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE50-ZPR", "name": "GUEST 50mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE50-ZPR-12GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
-  {"code": "GUE50-ZPR-34GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}
+  { code: 'GUE06-ZPR', name: 'GUEST 6mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE06-ZPR-14GW', name: 'GUEST 6mm Złączka prosta (bez gwintu) 1/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE06-ZPR-12GW', name: 'GUEST 6mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE08-ZPR', name: 'GUEST 8mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE08-ZPR-12GW', name: 'GUEST 8mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE08-ZPR-34GW', name: 'GUEST 8mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE10-ZPR', name: 'GUEST 10mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE10-ZPR-12GW', name: 'GUEST 10mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE10-ZPR-34GW', name: 'GUEST 10mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE12-ZPR', name: 'GUEST 12mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE12-ZPR-12GW', name: 'GUEST 12mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE12-ZPR-34GW', name: 'GUEST 12mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE16-ZPR', name: 'GUEST 16mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE16-ZPR-12GW', name: 'GUEST 16mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE16-ZPR-34GW', name: 'GUEST 16mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE20-ZPR', name: 'GUEST 20mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE20-ZPR-12GW', name: 'GUEST 20mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE20-ZPR-34GW', name: 'GUEST 20mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE25-ZPR', name: 'GUEST 25mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE25-ZPR-12GW', name: 'GUEST 25mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE25-ZPR-34GW', name: 'GUEST 25mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE32-ZPR', name: 'GUEST 32mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE32-ZPR-12GW', name: 'GUEST 32mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE32-ZPR-34GW', name: 'GUEST 32mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE40-ZPR', name: 'GUEST 40mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE40-ZPR-12GW', name: 'GUEST 40mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE40-ZPR-34GW', name: 'GUEST 40mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE50-ZPR', name: 'GUEST 50mm Złączka prosta (bez gwintu)', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE50-ZPR-12GW', name: 'GUEST 50mm Złączka prosta (bez gwintu) 1/2', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' },
+  { code: 'GUE50-ZPR-34GW', name: 'GUEST 50mm Złączka prosta (bez gwintu) 3/4', stage: '1. Instalacja hydrauliczna (złączki, gwinty)' }
 ];
 
 const STATIONS = [2,3,4,5,6];
 let currentStation = 4;
 let view = 'stage';
 let currentStage = null;
+
 const FALLBACK_STAGE = 'Inne';
 
 function lsGet(key, fallback){
-  try{ const v = localStorage.getItem(key); return v===null?fallback:JSON.parse(v); }catch(e){ return fallback; }
+  try {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : JSON.parse(value);
+  } catch (e) {
+    return fallback;
+  }
 }
-function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function lsSet(key, value){
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+function clearUserState(){
+  STATIONS.forEach(s => localStorage.removeItem('ekw_bom_' + s));
+  localStorage.removeItem('ekw_prices');
+  localStorage.removeItem('ekw_custom');
+  localStorage.removeItem('ekw_stage_override');
+  localStorage.removeItem('ekw_extra_stages');
+  STATIONS.forEach(s => localStorage.removeItem('ekw_notes_' + s));
+}
 
 let prices = lsGet('ekw_prices', {});
 let customItems = lsGet('ekw_custom', []);
 let stageOverride = lsGet('ekw_stage_override', {});
 let extraStages = lsGet('ekw_extra_stages', []);
-let boms = {}; STATIONS.forEach(s=>boms[s]=lsGet('ekw_bom_'+s, {}));
-let notes = {}; STATIONS.forEach(s=>notes[s]=lsGet('ekw_notes_'+s, ''));
+let boms = {};
+let notes = {};
 
-function normalizeStageName(stage){
-  if(stage === undefined || stage === null || stage === 'undefined' || stage === 'null' || String(stage).trim() === '') return FALLBACK_STAGE;
+STATIONS.forEach(s => {
+  boms[s] = lsGet('ekw_bom_' + s, {});
+  notes[s] = lsGet('ekw_notes_' + s, '');
+});
+
+function normalizeStageName(stage) {
+  if (stage === undefined || stage === null || stage === 'undefined' || stage === 'null' || String(stage).trim() === '') return FALLBACK_STAGE;
   return String(stage).trim();
 }
-function restoreBaseCatalogState(){
-  const baseStages = new Set(BASE_CATALOG.map(i => normalizeStageName(i.stage)));
-  const hasBaseStage = [...baseStages].some(s => extraStages.includes(s));
-  if(!hasBaseStage){
-    extraStages = [];
-    BASE_CATALOG.forEach(item => delete stageOverride[item.code]);
-    saveExtra(); saveOverride();
-  }
-}
-function allItems(){ return BASE_CATALOG.concat(customItems); }
-function effStage(item){
-  const itemStage = stageOverride[item.code] || item.stage;
-  return normalizeStageName(itemStage);
-}
-function allStages(){
-  const s = new Set(extraStages.map(normalizeStageName));
-  allItems().forEach(i=>s.add(effStage(i)));
-  return [...s].sort((a,b)=>String(a).localeCompare(String(b), 'pl'));
-}
-function jsString(value){ return String(value).replace(/\\/g,'\\\\').replace(/'/g, "\\'"); }
-function htmlSafe(value){ return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-restoreBaseCatalogState();
-if(!currentStage || !allStages().includes(currentStage)) currentStage = allStages()[0] || FALLBACK_STAGE;
-
-function saveBom(station){ lsSet('ekw_bom_'+station, boms[station]); }
+function saveBom(station){ lsSet('ekw_bom_' + station, boms[station]); }
 function savePrices(){ lsSet('ekw_prices', prices); }
 function saveCustom(){ lsSet('ekw_custom', customItems); }
 function saveOverride(){ lsSet('ekw_stage_override', stageOverride); }
 function saveExtra(){ lsSet('ekw_extra_stages', extraStages); }
-function saveNotes(station){ lsSet('ekw_notes_'+station, notes[station]); }
+function saveNotes(station){ lsSet('ekw_notes_' + station, notes[station]); }
+
+function allItems(){ return BASE_CATALOG.concat(customItems); }
+function normalizeItemStage(item){
+  return normalizeStageName(stageOverride[item.code] || item.stage);
+}
+function allStages(){
+  const stages = new Set();
+  (extraStages || []).forEach(s => stages.add(normalizeStageName(s)));
+  allItems().forEach(item => stages.add(normalizeItemStage(item)));
+  return Array.from(stages).sort((a, b) => String(a).localeCompare(String(b), 'pl'));
+}
+function htmlSafe(value){
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function jsString(value){
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function isCorruptedState(){
+  const validBaseStages = new Set(BASE_CATALOG.map(i => normalizeStageName(i.stage)));
+  const currentStages = (Array.isArray(extraStages) ? extraStages : []).map(normalizeStageName);
+  return currentStages.length > 0 && !currentStages.some(s => validBaseStages.has(s));
+}
+
+if (isCorruptedState()) {
+  clearUserState();
+  prices = {};
+  customItems = [];
+  stageOverride = {};
+  extraStages = [];
+  STATIONS.forEach(s => { boms[s] = {}; notes[s] = ''; });
+}
+
+function effStage(item){ return normalizeItemStage(item); }
 
 function itemRow(station, item, stagesList){
   const bom = boms[station];
-  const rec = bom[item.code] || {active:false, qty:0};
+  const rec = bom[item.code] || { active: false, qty: 0 };
   const price = prices[item.code] !== undefined ? prices[item.code] : '';
-  const value = (rec.active ? (rec.qty||0) * (parseFloat(price)||0) : 0);
+  const value = (rec.active ? (rec.qty || 0) * (parseFloat(price) || 0) : 0);
   const isCustom = item.code.startsWith('WLASNY-');
-  const stageOpts = stagesList.map(s=>`<option value="${htmlSafe(s)}" ${effStage(item)===s?'selected':''}>${htmlSafe(s)}</option>`).join('');
-  return `<tr class="${rec.active?'':'inactive'}" data-code="${item.code}">
-    <td><input type="checkbox" ${rec.active?'checked':''} onchange="toggleActive('${station}','${item.code}',this.checked)"></td>
-    <td class="code">${isCustom?'✏️ ':''}${item.code}</td>
+  const stageOptions = stagesList.map(s => `<option value="${htmlSafe(s)}" ${effStage(item) === s ? 'selected' : ''}>${htmlSafe(s)}</option>`).join('');
+  return `<tr class="${rec.active ? '' : 'inactive'}" data-code="${item.code}">
+    <td><input type="checkbox" ${rec.active ? 'checked' : ''} onchange="toggleActive('${station}','${item.code}',this.checked)"></td>
+    <td class="code">${isCustom ? '✏️ ' : ''}${item.code}</td>
     <td>${htmlSafe(item.name)}</td>
-    <td><select class="stage-select" onchange="moveItem('${item.code}',this.value)">${stageOpts}<option value="__new__">+ nowa kategoria…</option></select></td>
-    <td><input type="number" min="0" step="1" value="${rec.qty||0}" onchange="setQty('${station}','${item.code}',this.value)"></td>
-    <td><input type="number" min="0" step="0.01" class="price-input" value="${price}" placeholder="—" onchange="setPrice('${item.code}',this.value)"></td>
+    <td><select class="stage-select" onchange="moveItem('${item.code}', this.value)">${stageOptions}<option value="__new__">+ nowa kategoria…</option></select></td>
+    <td><input type="number" min="0" step="1" value="${rec.qty || 0}" onchange="setQty('${station}','${item.code}',this.value)"></td>
+    <td><input type="number" min="0" step="0.01" class="price-input" value="${price}" placeholder="—" onchange="setPrice('${item.code}', this.value)"></td>
     <td style="text-align:right; font-weight:600;">${value.toFixed(2)} zł</td>
     <td>
       <div class="row-actions">
@@ -214,230 +245,249 @@ function itemRow(station, item, stagesList){
 }
 
 function toggleActive(station, code, checked){
-  const bom = boms[station];
-  if(!bom[code]) bom[code] = {active:false, qty:1};
-  bom[code].active = checked;
-  if(checked && !bom[code].qty) bom[code].qty = 1;
-  saveBom(station); render();
+  if(!boms[station][code]) boms[station][code] = { active: false, qty: 1 };
+  boms[station][code].active = checked;
+  if (checked && !boms[station][code].qty) boms[station][code].qty = 1;
+  saveBom(station);
+  render();
 }
-function setQty(station, code, val){
-  const bom = boms[station];
-  if(!bom[code]) bom[code] = {active:true, qty:0};
-  bom[code].qty = parseFloat(val)||0;
-  saveBom(station); render();
+function setQty(station, code, value){
+  if(!boms[station][code]) boms[station][code] = { active: true, qty: 0 };
+  boms[station][code].qty = parseFloat(value) || 0;
+  saveBom(station);
+  render();
 }
-function setPrice(code, val){
-  if(val==='') delete prices[code]; else prices[code] = parseFloat(val);
-  savePrices(); render();
+function setPrice(code, value){
+  if (value === '') delete prices[code];
+  else prices[code] = parseFloat(value);
+  savePrices();
+  render();
 }
 function moveItem(code, newStage){
-  if(newStage==='__new__'){
+  if(newStage === '__new__') {
     const name = prompt('Nazwa nowej kategorii:');
     if(!name) { render(); return; }
     stageOverride[code] = name.trim();
   } else {
     stageOverride[code] = newStage;
   }
-  saveOverride(); render();
+  saveOverride();
+  render();
 }
 function renameStage(oldName){
   const newName = prompt('Nowa nazwa kategorii:', oldName);
-  if(!newName || newName===oldName) return;
+  if (!newName || newName === oldName) return;
   const trimmed = newName.trim();
-  if(!trimmed) return;
-  allItems().forEach(i=>{ if(effStage(i)===oldName) stageOverride[i.code] = trimmed; });
-  const ei = extraStages.indexOf(oldName);
-  if(ei>-1){ extraStages[ei] = trimmed; saveExtra(); }
+  if (!trimmed) return;
+  allItems().forEach(item => { if (effStage(item) === oldName) stageOverride[item.code] = trimmed; });
+  const idx = extraStages.indexOf(oldName);
+  if (idx > -1) extraStages[idx] = trimmed;
+  saveExtra();
   saveOverride();
-  if(currentStage===oldName) currentStage = trimmed;
+  if (currentStage === oldName) currentStage = trimmed;
   render();
 }
 function removeStage(stageName){
-  if(!stageName) return;
-  if(!extraStages.includes(stageName)){
-    alert('Ta kategoria jest wbudowana i nie może zostać usunięta. Możesz tylko zmienić jej nazwę lub przenieść pozycje.');
+  if (!extraStages.includes(stageName)) {
+    alert('Ta kategoria jest wbudowana i nie może zostać usunięta.');
     return;
   }
-  const fallback = allStages().filter(s=>s!==stageName)[0] || FALLBACK_STAGE;
-  if(!confirm(`Ukryć kategorię "${stageName}"? Produkty zostaną zachowane, ale przeniesione do kategorii "${fallback}".`)) return;
-
-  allItems().forEach(i=>{ if(effStage(i)===stageName) stageOverride[i.code] = fallback; });
-  extraStages = extraStages.filter(s=>s!==stageName);
-  saveExtra(); saveOverride();
-  if(currentStage===stageName) currentStage = fallback;
+  const fallback = allStages().filter(s => s !== stageName)[0] || FALLBACK_STAGE;
+  if (!confirm(`Ukryć kategorię "${stageName}"? Produkty zostaną przeniesione do "${fallback}".`)) return;
+  allItems().forEach(item => { if (effStage(item) === stageName) stageOverride[item.code] = fallback; });
+  extraStages = extraStages.filter(s => s !== stageName);
+  saveExtra();
+  saveOverride();
+  if (currentStage === stageName) currentStage = fallback;
   render();
 }
 function addCategory(){
-  const name = prompt('Nazwa nowej (pustej) kategorii:');
-  if(!name) return;
+  const name = prompt('Nazwa nowej kategorii:');
+  if (!name) return;
   const trimmed = name.trim();
-  if(!trimmed) return;
-  if(!extraStages.includes(trimmed)){ extraStages.push(trimmed); saveExtra(); }
-  currentStage = trimmed; view='stage'; render();
+  if (!trimmed) return;
+  if (!extraStages.includes(trimmed)) extraStages.push(trimmed);
+  currentStage = trimmed;
+  view = 'stage';
+  saveExtra();
+  render();
 }
-
 function addCustomItem(station, stage){
   const nameEl = document.getElementById('newName');
   const qtyEl = document.getElementById('newQty');
   const priceEl = document.getElementById('newPrice');
   const name = nameEl.value.trim();
-  if(!name){ nameEl.focus(); return; }
-  const qty = parseFloat(qtyEl.value)||1;
-  const price = parseFloat(priceEl.value)||0;
+  if (!name) { nameEl.focus(); return; }
+  const qty = parseFloat(qtyEl.value) || 1;
+  const price = parseFloat(priceEl.value) || 0;
   const code = 'WLASNY-' + Date.now();
-  customItems.push({code, name, stage});
+  customItems.push({ code, name, stage });
   prices[code] = price;
-  if(!boms[station][code]) boms[station][code] = {active:true, qty:qty};
-  saveCustom(); savePrices(); saveBom(station);
+  if (!boms[station][code]) boms[station][code] = { active: true, qty: qty };
+  saveCustom();
+  savePrices();
+  saveBom(station);
   render();
 }
 function editProduct(code){
-  const item = allItems().find(i=>i.code===code);
-  if(!item) return;
-
+  const item = allItems().find(i => i.code === code);
+  if (!item) return;
   const currentName = item.name;
   const currentStage = effStage(item);
   const currentPrice = prices[code] !== undefined ? prices[code] : '';
 
   const newName = prompt('Edytuj nazwę produktu:', currentName);
-  if(newName === null) return;
-  const trimmedName = newName.trim();
-  if(trimmedName && item.code.startsWith('WLASNY-')) item.name = trimmedName;
-  else if(trimmedName && !item.code.startsWith('WLASNY-')){
-    alert('Dla katalogowych produktów można zmieniać tylko cenę i kategorię. Nazwa produktu pozostaje niezmieniona.');
+  if (newName !== null && item.code.startsWith('WLASNY-')) {
+    const trimmed = newName.trim();
+    if (trimmed) item.name = trimmed;
   }
 
   const newStage = prompt('Edytuj kategorię produktu:', currentStage);
-  if(newStage !== null){
-    const trimmedStage = newStage.trim();
-    if(trimmedStage){ stageOverride[code] = trimmedStage; }
-    else { delete stageOverride[code]; }
+  if (newStage !== null) {
+    const trimmed = newStage.trim();
+    if (trimmed) stageOverride[code] = trimmed;
+    else delete stageOverride[code];
   }
 
   const newPrice = prompt('Edytuj cenę produktu:', currentPrice === '' ? '' : String(currentPrice));
-  if(newPrice !== null){
-    const parsed = newPrice.trim();
-    if(!parsed){ delete prices[code]; }
+  if (newPrice !== null) {
+    const trimmed = newPrice.trim();
+    if (!trimmed) delete prices[code];
     else {
-      const p = parseFloat(parsed.replace(',', '.').replace(/[^0-9.]/g,''));
-      if(!isNaN(p)) prices[code] = p;
+      const parsed = parseFloat(trimmed.replace(',', '.').replace(/[^0-9.]/g, ''));
+      if (!isNaN(parsed)) prices[code] = parsed;
     }
   }
 
-  saveCustom(); savePrices(); saveOverride(); render();
+  saveCustom();
+  saveOverride();
+  savePrices();
+  render();
 }
 function deleteCustom(code){
-  if(!confirm('Usunąć tę pozycję ze spisu?')) return;
-  customItems = customItems.filter(i=>i.code!==code);
+  if (!confirm('Usunąć tę pozycję ze spisu?')) return;
+  customItems = customItems.filter(item => item.code !== code);
   delete prices[code];
   delete stageOverride[code];
-  STATIONS.forEach(s=>{ delete boms[s][code]; saveBom(s); });
-  saveCustom(); savePrices(); saveOverride();
+  STATIONS.forEach(s => { delete boms[s][code]; saveBom(s); });
+  saveCustom();
+  savePrices();
+  saveOverride();
   render();
 }
 function softDeleteProduct(station, code){
-  const item = allItems().find(i=>i.code===code);
+  const item = allItems().find(i => i.code === code);
   const label = item ? item.name : code;
-  if(!confirm(`Ukryć produkt "${label}" z ${station}. stanowiska? Produkt pozostanie w katalogu.`)) return;
-  const bom = boms[station];
-  if(!bom[code]) bom[code] = {active:false, qty:0};
-  bom[code].active = false;
-  bom[code].qty = 0;
-  saveBom(station); render();
+  if (!confirm(`Ukryć produkt "${label}" z ${station}. stanowiska?`)) return;
+  if (!boms[station][code]) boms[station][code] = { active: false, qty: 0 };
+  boms[station][code].active = false;
+  boms[station][code].qty = 0;
+  saveBom(station);
+  render();
 }
-
 function stageTotal(station, stage){
-  const bom = boms[station]; let t=0;
-  allItems().filter(i=>effStage(i)===stage).forEach(i=>{
-    const rec = bom[i.code];
-    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
+  let sum = 0;
+  allItems().filter(item => effStage(item) === stage).forEach(item => {
+    const rec = boms[station][item.code];
+    if (rec && rec.active) sum += (rec.qty || 0) * (parseFloat(prices[item.code]) || 0);
   });
-  return t;
+  return sum;
 }
 function grandTotal(station){
-  const bom = boms[station]; let t=0;
-  allItems().forEach(i=>{
-    const rec = bom[i.code];
-    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
+  let sum = 0;
+  allItems().forEach(item => {
+    const rec = boms[station][item.code];
+    if (rec && rec.active) sum += (rec.qty || 0) * (parseFloat(prices[item.code]) || 0);
   });
-  return t;
+  return sum;
 }
 function stageHasItems(stage, station){
-  const bom = boms[station];
-  return allItems().filter(i=>effStage(i)===stage).some(i=> bom[i.code] && bom[i.code].active);
+  return allItems().filter(item => effStage(item) === stage).some(item => {
+    const rec = boms[station][item.code];
+    return rec && rec.active;
+  });
 }
 function parseCennik(text){
-  const lines = text.split(/\n/); let updated=0;
-  lines.forEach(line=>{
-    const parts = line.split(/\t|;/).map(s=>s.trim());
-    if(parts.length>=2){
+  const lines = text.split(/\n/);
+  let updated = 0;
+  lines.forEach(line => {
+    const parts = line.split(/\t|;/).map(s => s.trim());
+    if (parts.length >= 2) {
       const code = parts[0];
-      const p = parseFloat(parts[1].replace(',', '.').replace(/[^0-9.]/g,''));
-      if(code && !isNaN(p)){ prices[code]=p; updated++; }
+      const p = parseFloat(parts[1].replace(',', '.').replace(/[^0-9.]/g, ''));
+      if (code && !isNaN(p)) {
+        prices[code] = p;
+        updated++;
+      }
     }
   });
   savePrices();
   return updated;
 }
-
 function render(){
   const stagesList = allStages();
-  if(!stagesList.length){
+  if (!stagesList.length) {
     document.getElementById('tabs').innerHTML = '';
     document.getElementById('main').innerHTML = '<div class="card"><h3>Brak kategorii</h3><p class="hint">Dodaj nową kategorię, aby rozpocząć.</p></div>';
     return;
   }
-  if(!currentStage || !stagesList.includes(currentStage)) currentStage = stagesList[0];
 
-  document.getElementById('tabs').innerHTML = STATIONS.map(s=>
-    `<button class="tab-btn ${s===currentStation?'active':''}" onclick="selectStation(${s})">${s} stanowiska</button>`
+  if (!currentStage || !stagesList.includes(currentStage)) currentStage = stagesList[0];
+
+  document.getElementById('tabs').innerHTML = STATIONS.map(s =>
+    `<button class="tab-btn ${s === currentStation ? 'active' : ''}" onclick="selectStation(${s})">${s} stanowiska</button>`
   ).join('');
 
   let html = '<div class="stage-nav no-print">';
-  stagesList.forEach(st=>{
-    const active = (st===currentStage && view==='stage');
+  stagesList.forEach(st => {
+    const active = st === currentStage && view === 'stage';
     const done = stageHasItems(st, currentStation);
     const removable = extraStages.includes(st);
     const stageJs = jsString(st);
-    html += `<span class="stage-chip ${active?'active':''} ${done?'done':''}">
+    html += `<span class="stage-chip ${active ? 'active' : ''} ${done ? 'done' : ''}">
       <span onclick="selectStage('${stageJs}')">${htmlSafe(st)}</span>
       <span class="edit-ic" onclick="renameStage('${stageJs}')" title="Zmień nazwę">✎</span>
       ${removable ? `<span class="edit-ic" onclick="removeStage('${stageJs}')" title="Ukryj kategorię">🗑</span>` : ''}
     </span>`;
   });
   html += `<button class="small" onclick="addCategory()">+ kategoria</button>`;
-  html += `<button class="stage-chip ${view==='cennik'?'active':''}" onclick="setView('cennik')">💰 Cennik</button>`;
-  html += `<button class="stage-chip ${view==='uwagi'?'active':''}" onclick="setView('uwagi')">📝 Uwagi</button>`;
-  html += `<button class="stage-chip ${view==='summary'?'active':''}" onclick="setView('summary')">📋 Podsumowanie</button>`;
+  html += `<button class="stage-chip ${view === 'cennik' ? 'active' : ''}" onclick="setView('cennik')">💰 Cennik</button>`;
+  html += `<button class="stage-chip ${view === 'uwagi' ? 'active' : ''}" onclick="setView('uwagi')">📝 Uwagi</button>`;
+  html += `<button class="stage-chip ${view === 'summary' ? 'active' : ''}" onclick="setView('summary')">📋 Podsumowanie</button>`;
   html += `</div>`;
 
-  if(view==='cennik'){
+  if (view === 'cennik') {
     html += `<div class="card"><h3>Wklej cennik z wFirma</h3>
       <p class="hint">Wklej dwie kolumny: kod SKU i cena (rozdzielone tabulatorem lub średnikiem), po jednej pozycji w linii. Aktualizuje ceny dla wszystkich zakładek naraz.</p>
       <textarea id="cennikArea" placeholder="GUE06-ZPR\t6,39\nGUE06-ZPR-14GW\t9,29"></textarea>
       <div style="margin-top:8px;"><button class="nav" onclick="applyCennik()">Zastosuj cennik</button>
       <span id="cennikMsg" class="hint"></span></div></div>`;
-  } else if(view==='uwagi'){
+  } else if (view === 'uwagi') {
     html += `<div class="card"><h3>Uwagi — ${currentStation} stanowiska</h3>
-      <p class="hint">Wolne notatki dotyczące tej konkretnej konfiguracji (np. ustalenia z klientem, odstępstwa od standardu).</p>
-      <textarea id="uwagiArea" oninput="notes[${currentStation}]=this.value; saveNotes(${currentStation});">${htmlSafe(notes[currentStation]||'')}</textarea>
+      <p class="hint">Wolne notatki dotyczące tej konkretnej konfiguracji.</p>
+      <textarea id="uwagiArea" oninput="notes[${currentStation}] = this.value; saveNotes(${currentStation});">${htmlSafe(notes[currentStation] || '')}</textarea>
     </div>`;
-  } else if(view==='summary'){
+  } else if (view === 'summary') {
     html += `<div class="card"><h3>Podsumowanie — ${currentStation} stanowiska</h3>`;
-    let gt=0;
-    stagesList.forEach(st=>{
+    let total = 0;
+    stagesList.forEach(st => {
       const t = stageTotal(currentStation, st);
-      if(t>0){ gt+=t; html += `<div class="summary-row"><span>${htmlSafe(st)}</span><b>${t.toFixed(2)} zł</b></div>`; }
+      if (t > 0) {
+        total += t;
+        html += `<div class="summary-row"><span>${htmlSafe(st)}</span><b>${t.toFixed(2)} zł</b></div>`;
+      }
     });
-    html += `<div class="summary-row" style="border-top:2px solid var(--accent); margin-top:8px; font-size:16px;"><span>RAZEM</span><b>${gt.toFixed(2)} zł</b></div>`;
-    if(notes[currentStation]){ html += `<div style="margin-top:14px;"><b>Uwagi:</b><p style="white-space:pre-wrap;">${htmlSafe(notes[currentStation])}</p></div>`; }
+    html += `<div class="summary-row" style="border-top:2px solid var(--accent); margin-top:8px; font-size:16px;"><span>RAZEM</span><b>${total.toFixed(2)} zł</b></div>`;
+    if (notes[currentStation]) {
+      html += `<div style="margin-top:14px;"><b>Uwagi:</b><p style="white-space:pre-wrap;">${htmlSafe(notes[currentStation])}</p></div>`;
+    }
     html += `<div style="margin-top:14px;"><button class="nav secondary" onclick="window.print()">Drukuj / eksportuj do PDF</button></div></div>`;
   } else {
-    const items = allItems().filter(i=>effStage(i)===currentStage);
+    const items = allItems().filter(item => effStage(item) === currentStage);
     html += `<div class="card"><h3>${htmlSafe(currentStage)}</h3>
       <table><thead><tr><th></th><th>Kod</th><th>Nazwa</th><th>Kategoria</th><th>Ilość</th><th>Cena</th><th>Wartość</th><th></th></tr></thead>
-      <tbody>${items.map(i=>itemRow(currentStation,i,stagesList)).join('')}</tbody></table>
-      <div class="subtotal">Suma etapu: ${stageTotal(currentStation,currentStage).toFixed(2)} zł</div>
+      <tbody>${items.map(item => itemRow(currentStation, item, stagesList)).join('')}</tbody></table>
+      <div class="subtotal">Suma etapu: ${stageTotal(currentStation, currentStage).toFixed(2)} zł</div>
       <div class="addform no-print">
         <input type="text" id="newName" placeholder="Nazwa własnego produktu">
         <input type="number" id="newQty" placeholder="Ilość" value="1" min="0">
@@ -452,27 +502,16 @@ function render(){
   }
 
   document.getElementById('main').innerHTML = html;
-  document.getElementById('grandTotal').textContent = grandTotal(currentStation).toFixed(2)+' zł';
-  document.getElementById('stageLabel').textContent = view==='summary'?'Podsumowanie':(view==='cennik'?'Cennik':(view==='uwagi'?'Uwagi':(currentStation+' stanowiska • '+currentStage)));
+  document.getElementById('grandTotal').textContent = grandTotal(currentStation).toFixed(2) + ' zł';
+  document.getElementById('stageLabel').textContent = view === 'summary' ? 'Podsumowanie' : (view === 'cennik' ? 'Cennik' : (view === 'uwagi' ? 'Uwagi' : (currentStation + ' stanowiska • ' + currentStage)));
 }
 
-function selectStation(s){ currentStation=s; view='stage'; render(); }
-function selectStage(st){ currentStage=st; view='stage'; render(); }
-function setView(v){ view=v; render(); }
-function prevStage(){
-  const list = allStages(); const idx = list.indexOf(currentStage);
-  if(idx>0){ currentStage=list[idx-1]; render(); }
-}
-function nextStage(){
-  const list = allStages(); const idx = list.indexOf(currentStage);
-  if(idx<list.length-1){ currentStage=list[idx+1]; render(); } else { setView('summary'); }
-}
-function applyCennik(){
-  const text = document.getElementById('cennikArea').value;
-  const n = parseCennik(text);
-  document.getElementById('cennikMsg').textContent = `Zaktualizowano ${n} cen.`;
-  render();
-}
+function selectStation(s){ currentStation = s; view = 'stage'; render(); }
+function selectStage(st){ currentStage = st; view = 'stage'; render(); }
+function setView(v){ view = v; render(); }
+function prevStage(){ const list = allStages(); const idx = list.indexOf(currentStage); if (idx > 0) currentStage = list[idx - 1]; render(); }
+function nextStage(){ const list = allStages(); const idx = list.indexOf(currentStage); if (idx < list.length - 1) currentStage = list[idx + 1]; else setView('summary'); }
+function applyCennik(){ const text = document.getElementById('cennikArea').value; const count = parseCennik(text); document.getElementById('cennikMsg').textContent = `Zaktualizowano ${count} cen.`; render(); }
 
 render();
 </script>
