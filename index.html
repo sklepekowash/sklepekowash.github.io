@@ -1,828 +1,585 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EkoWash — Spis myjni</title>
-  <style>
-    :root {
-      --bg: #f3f5f9;
-      --card: #ffffff;
-      --text: #17212f;
-      --muted: #667085;
-      --border: #dfe5ee;
-      --accent: #2f5aa9;
-      --accent-soft: #eaf1ff;
-      --ok: #1f8a4c;
-      --warn: #c0392b;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; height: 100%; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-    }
-
-    header {
-      background: var(--accent);
-      color: white;
-      padding: 12px 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    h1 { margin: 0 0 10px; font-size: 18px; }
-    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-    .tab-btn {
-      border: none; border-radius: 8px;
-      background: rgba(255,255,255,0.12);
-      color: white; font-weight: 700; padding: 8px 12px; cursor: pointer;
-    }
-    .tab-btn.active {
-      background: white; color: var(--accent);
-    }
-
-    main {
-      max-width: 1100px; margin: 0 auto;
-      padding: 18px 14px 80px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .stage-nav {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      align-items: center; margin-bottom: 14px;
-    }
-
-    .stage-chip {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 7px 12px;
-      cursor: pointer;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .stage-chip.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-    .stage-chip.done {
-      border-color: var(--ok);
-      color: var(--ok);
-    }
-
-    .secondary-btn, .nav-btn, .small-btn {
-      border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
-    }
-    .secondary-btn {
-      background: var(--accent-soft); color: var(--accent); padding: 9px 14px;
-    }
-    .nav-btn {
-      background: var(--accent); color: white; padding: 9px 16px;
-    }
-    .small-btn {
-      background: var(--accent-soft); color: var(--accent); padding: 7px 10px;
-      font-size: 12px;
-    }
-
-    table {
-      width: 100%; border-collapse: collapse; margin-top: 8px;
-    }
-    th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 8px 6px; text-align: left; vertical-align: middle;
-    }
-    th {
-      color: var(--muted); text-transform: uppercase; font-size: 11px;
-    }
-    tr.inactive td { opacity: 0.45; }
-    .code { font-weight: 700; font-family: Consolas, monospace; }
-    .price-input, input[type=number], input[type=text] {
-      width: 100%; max-width: 110px; padding: 6px 8px;
-      border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--text);
-    }
-    .code-input { max-width: 120px; font-family: Consolas, monospace; }
-    .qty-input { max-width: 70px; }
-    select {
-      width: 100%; max-width: 180px; padding: 6px 8px; border-radius: 6px;
-      border: 1px solid var(--border); background: white; color: var(--text);
-    }
-
-    .subtotal, .summary-row {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);
-      font-weight: 700;
-    }
-
-    .add-form {
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px;
-      padding-top: 16px; border-top: 1px dashed var(--border);
-    }
-    .add-form input[type=text] { min-width: 180px; max-width: none; flex: 1; }
-
-    .sticky-footer {
-      position: fixed; left: 0; right: 0; bottom: 0;
-      background: var(--card); border-top: 1px solid var(--border);
-      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-      z-index: 20;
-    }
-    .grand-total { font-size: 18px; font-weight: 800; color: var(--accent); }
-
-    textarea {
-      width: 100%; min-height: 140px; padding: 10px; resize: vertical;
-      border: 1px solid var(--border); border-radius: 8px; background: white; color: var(--text);
-      font-family: Consolas, monospace; font-size: 12px;
-    }
-
-    .hint { color: var(--muted); font-size: 12px; }
-    .danger { color: var(--warn); background: transparent; border: none; font-size: 18px; cursor: pointer; }
-
-    .stage-actions {
-      display: flex; gap: 8px; align-items: center;
-    }
-    .stage-actions button {
-      border: none; background: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
-      border-radius: 4px; transition: background 0.2s;
-    }
-    .stage-actions button:hover {
-      background: rgba(0,0,0,0.1);
-    }
-
-    .modal-overlay {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
-    }
-    .modal-overlay.active {
-      display: flex;
-    }
-    .modal-content {
-      background: white; border-radius: 12px; padding: 24px; max-width: 400px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-    .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-    .modal-content input {
-      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; font-size: 14px;
-    }
-    .modal-buttons {
-      display: flex; gap: 8px; justify-content: flex-end;
-    }
-    .modal-buttons button {
-      border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 700;
-    }
-    .modal-buttons .nav-btn { background: var(--accent); color: white; }
-    .modal-buttons .secondary-btn { background: var(--border); color: var(--text); }
-
-    @media (max-width: 700px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      thead { display: none; }
-      tr {
-        border: 1px solid var(--border); border-radius: 10px; background: white;
-        padding: 10px; margin-bottom: 12px; display: block;
-      }
-      td { border: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-      td::before {
-        content: attr(data-label);
-        color: var(--muted); font-size: 11px; text-transform: uppercase;
-        font-weight: 700;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EkoWash — Spis myjni</title>
+<style>
+:root{
+  --bg:#f7f8fa; --card:#ffffff; --text:#1a1d23; --muted:#6b7280;
+  --border:#e3e6ea; --accent:#2e5395; --accent-bg:#eaf0fb;
+  --ok:#1f8a4c; --warn:#c0392b; --header-bg:#2e5395; --header-text:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161a; --card:#1c1f26; --text:#e8eaed; --muted:#9aa1ac;
+    --border:#2b2f38; --accent:#6f9ceb; --accent-bg:#1e2a42;
+    --ok:#4fbf7a; --warn:#e0665a; --header-bg:#1c2c4a; --header-text:#eef2fb;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161a; --card:#1c1f26; --text:#e8eaed; --muted:#9aa1ac;
+  --border:#2b2f38; --accent:#6f9ceb; --accent-bg:#1e2a42;
+  --ok:#4fbf7a; --warn:#e0665a; --header-bg:#1c2c4a; --header-text:#eef2fb;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  font-size:14px;
+}
+header{
+  background:var(--header-bg); color:var(--header-text);
+  padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px));
+  position:sticky; top:0; z-index:20;
+}
+header h1{margin:0 0 8px 0; font-size:16px; font-weight:600;}
+.tabs{display:flex; gap:6px; flex-wrap:wrap;}
+.tab-btn{
+  background:rgba(255,255,255,0.12); color:var(--header-text); border:none;
+  padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; font-weight:600;
+}
+.tab-btn.active{background:#fff; color:var(--header-bg);}
+main{max-width:1000px; margin:0 auto; padding:14px; padding-bottom:90px;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;}
+.stage-nav{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; align-items:center;}
+.stage-chip{
+  background:var(--card); border:1px solid var(--border); color:var(--text);
+  padding:6px 10px; border-radius:16px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;
+}
+.stage-chip.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+.stage-chip.done{border-color:var(--ok); color:var(--ok);}
+.stage-chip .edit-ic{opacity:0.6; font-size:11px;}
+table{width:100%; border-collapse:collapse; font-size:12.5px;}
+th{text-align:left; color:var(--muted); font-weight:600; padding:6px 4px; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase;}
+td{padding:6px 4px; border-bottom:1px solid var(--border); vertical-align:middle;}
+tr.inactive td{opacity:0.4;}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:600;}
+input[type=number]{width:60px; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
+input.price-input{width:75px; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
+input[type=checkbox]{width:16px; height:16px;}
+select.stage-select{font-size:11px; padding:3px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); max-width:120px;}
+.subtotal{text-align:right; font-weight:700; margin-top:10px; font-size:14px;}
+.navrow{display:flex; justify-content:space-between; margin-top:14px; gap:8px;}
+button.nav{
+  background:var(--accent); color:#fff; border:none; padding:10px 18px;
+  border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+}
+button.nav.secondary{background:var(--accent-bg); color:var(--accent);}
+button.small{background:var(--accent-bg); color:var(--accent); border:none; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer;}
+button.danger{background:transparent; color:var(--warn); border:none; cursor:pointer; font-size:14px;}
+footer.sticky{
+  position:fixed; bottom:0; left:0; right:0; background:var(--card); border-top:1px solid var(--border);
+  padding:10px 14px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  display:flex; justify-content:space-between; align-items:center; z-index:20;
+}
+.total-big{font-size:17px; font-weight:800; color:var(--accent);}
+textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);}
+.hint{color:var(--muted); font-size:12px; margin-top:6px;}
+.summary-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:13px;}
+.summary-row b{color:var(--accent);}
+.addform{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); align-items:center;}
+.addform input[type=text]{flex:1; min-width:140px; padding:6px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
+.addform input[type=number]{width:80px;}
+@media print{
+  header,.stage-nav,.navrow,footer.sticky,.no-print,.addform{display:none !important;}
+  body{background:#fff; color:#000;}
+}
+.tab-wrap{display:inline-flex; align-items:center; gap:2px; border-radius:8px;}
+.tab-wrap.active{background:rgba(255,255,255,0.18); padding-right:4px;}
+.tab-ic{background:transparent; border:none; color:var(--header-text); cursor:pointer; font-size:13px; padding:6px 5px; opacity:0.85;}
+.tab-ic:hover{opacity:1;}
+.tab-btn.add{background:transparent; border:1px dashed rgba(255,255,255,0.5);}
+.stage-chip .edit-ic{cursor:pointer; padding:0 2px;}
+.stage-chip .edit-ic:hover{opacity:1;}
+.card-head{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+.card-head h3{margin:8px 0;}
+button.small.warn{color:var(--warn);}
+button.icon{background:transparent; border:none; color:var(--accent); cursor:pointer; font-size:14px; padding:2px 4px;}
+.row-actions{white-space:nowrap; text-align:right;}
+.table-wrap{overflow-x:auto;}
+.addform input.code-in{flex:0 1 150px; min-width:110px;}
+#modal{position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:100; padding:16px;}
+.modal-box{background:var(--card); color:var(--text); border-radius:12px; padding:16px; width:100%; max-width:440px; max-height:90vh; overflow:auto; box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+.modal-box h3{margin:0 0 12px 0;}
+label.mf{display:block; margin-bottom:10px;}
+label.mf span{display:block; font-size:12px; color:var(--muted); margin-bottom:4px;}
+label.mf input, label.mf select{width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-size:14px; max-width:none;}
+.modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:14px;}
+@media print{ #modal{display:none !important;} .row-actions{display:none;} }
+</style>
 </head>
 <body>
-  <header>
-    <h1>EkoWash — Spis myjni</h1>
-    <div id="tabs" class="tabs"></div>
-  </header>
+<header>
+  <h1>EkoWash — spis materiałowy myjni</h1>
+  <div class="tabs" id="tabs"></div>
+</header>
+<main id="main"></main>
+<footer class="sticky">
+  <span id="stageLabel" style="color:var(--muted); font-size:12px;"></span>
+  <span class="total-big" id="grandTotal">0,00 zł</span>
+</footer>
+<div id="modal" onclick="closeModal()"></div>
 
-  <main id="main"></main>
+<script>
+const BASE_CATALOG = [{"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta GW 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-14GZ", "name": "GUEST 6mm Złączka prosta GZ 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZKA-14GZ", "name": "GUEST 6mm Złączka kątowa GZ 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZWR", "name": "GUEST 6mm Zawór zwrotny", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR", "name": "GUEST 8mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-TRO", "name": "GUEST 8mm Trójnik", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR-14GW", "name": "GUEST 8mm Złączka prosta GW 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR-14GZ", "name": "GUEST 8mm Złączka prosta GZ 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR-38GZ", "name": "GUEST 8mm Złączka prosta GZ 3/8\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZKA", "name": "GUEST 8mm Złączka kątowa 90° (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZKA-14GZ", "name": "GUEST 8mm Złączka kątowa GZ 1/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZKA-38GZ", "name": "GUEST 8mm Złączka kątowa GZ 3/8\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZWR", "name": "GUEST 8mm Zawór zwrotny", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZPR", "name": "GUEST 10mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZPR-38GZ", "name": "GUEST 10mm Złączka prosta GZ 3/8\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZKA-12GZ", "name": "GUEST 10mm Złączka kątowa GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR", "name": "GUEST 12mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-TRO", "name": "GUEST 12mm Trójnik", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR-12GZ", "name": "GUEST 12mm Złączka prosta GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR-38GZ", "name": "GUEST 12mm Złączka prosta GZ 3/8\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZKA-12GZ", "name": "GUEST 12mm Złączka kątowa GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZKA-38GZ", "name": "GUEST 12mm Złączka kątowa GZ 3/8\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZWR", "name": "GUEST 12mm Zawór zwrotny", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZKR-12GZ", "name": "GUEST 12mm Złączka króciec GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE15-ZPR-12GZ", "name": "GUEST 15mm Złączka prosta GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE15-ZPR-34GZ", "name": "GUEST 15mm Złączka prosta GZ 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE15-ZRE", "name": "GUEST 15mm Złączka redukcja na 12mm", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE15-ZKA", "name": "GUEST 15mm Złączka kątowa (bez gwinu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE22-ZPR", "name": "GUEST 22mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE22-TRO", "name": "GUEST 22mm Trójnik", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE22-ZPR-34GZ", "name": "GUEST 22mm Złączka prosta GZ 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE22-ZKA", "name": "GUEST 22mm Złączka kątowa 90° (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE22-ZKR-12GZ", "name": "GUEST 22mm Króciec GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZAB", "name": "GUEST 6mm Zabezpieczenie", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZAB", "name": "GUEST 8mm Zabezpieczenie", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZAB", "name": "GUEST 12mm Zabezpieczenie", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-ZPR-1K-12GZ", "name": "KAN 15'' Złączka prosta 1x kielich GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-ZPR2-1K-12GZ", "name": "KAN 15\" Złączka prosta dwuczęściowa 1x kielich GZ 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-MUF", "name": "KAN 15\" Mufa (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-TRO-2K-12GW", "name": "KAN 15\" Trójnik 2x kielich GW 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-TRO-3K", "name": "KAN 15\" Trójnik 3x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-KOL-2K", "name": "KAN 15\" Kolano 2x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-KOL-1K", "name": "KAN 15\" Kolano 1x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN15-ZPR-1K-12GW", "name": "KAN 15\" Złączka prosta 1x kielich GW 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-ZSL", "name": "KAN 28\" Zaślepka", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-ZKA-01GW", "name": "KAN 28\" Złączka kątowa GW 1\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-TRO-2K-01GW", "name": "KAN 28\" Trójnik 2x kielich GW 1\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-MUF", "name": "KAN 28\" Mufa (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-KOL-1K-01GW", "name": "KAN 28\" Kolano 1x kielich GW 1\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-TRO-2K-12GW", "name": "KAN 28\" Trójnik 2x kielich GW 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-KOL-1K-12GW", "name": "KAN 28\" Kolano 1x kielich GW 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-TRO-3K", "name": "KAN 28\" Trójnik 3x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-KOL-2K", "name": "KAN 28\" Kolano 2x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-KOL-1K", "name": "KAN 28\" kolano 1x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-ZPR-01GZ", "name": "KAN 28\" Złączka prosta GZ 1\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-ZPR-01GW", "name": "KAN 28\" Złączka prosta GW 1\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-TRO-3K", "name": "KAN 22\" Trójnik 3x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-PSR-34GW", "name": "KAN 22\" Półśrubunek GW 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-KOL-1K", "name": "KAN 22\" Kolano 1x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-KOL-2K", "name": "KAN 22\" Kolano 2x kielich (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-KOL-1K-34GW", "name": "KAN 22\" Kolano 1x kielich GW 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-TRO-2K-34GW", "name": "KAN 22\" Trójnik 2x kielich GW 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-ZPR-34GZ", "name": "KAN 22\" Złączka prosta GZ 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-ZPR-34GW", "name": "KAN 22\" Złączka prosta GW 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-RED-01GW", "name": "Redukcja GW 1\" x GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-RED-34GW", "name": "Redukcja GW 3/4\" x GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-KOR-34GZ", "name": "Korek z uszczelką GZ 3/4\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-RED-54GW", "name": "Mufa redukcja GW 5/4\" x GZ 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-ZWR-12GW", "name": "Zawór zwrotny z grzybkiem GW 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-RED-34GZ", "name": "Nypel redukcja GZ 3/4\" x GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-KOL-01GWGZ", "name": "Kolano GW/GZ 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-KOL-01GW", "name": "Kolano GW 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-FLT-01GW", "name": "Filtr skośny GW 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-MUF-01GW", "name": "Mufa GW 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-NYP-01GZ", "name": "Nypel GZ 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD50-34GWGZ", "name": "Przedłużka 50mm GW/GZ 3/4\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD10-12GWGZ", "name": "Przedłużka 10mm GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD50-12GWGZ", "name": "Przedłużka 50mm GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD30-01GWGZ", "name": "Przedłużka 30mm GW/GZ 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD40-12GWGZ", "name": "Przedłużka 40mm GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD15-12GWGZ", "name": "Przedłużka 15mm GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-PRD20-12GWGZ", "name": "Przedłużka 20mm GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-KOL-34GWGZ", "name": "Kolano GW/GZ 3/4\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-SRU-12GWGZ", "name": "Śrubunek GW/GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-CZW-12GW", "name": "Czwórnik GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-TRO-12GW", "name": "Trójnik GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOL-12GWGZ", "name": "Kolano GW/GZ 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOL-12GW", "name": "Kolano GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRU-12GWGZ", "name": "Śrubunek GW/GZ 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRU-12GW", "name": "Śrubunek GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRN-12GW", "name": "Śrubunek niski GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-NYP-12GZ", "name": "Nypel GZ 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-RED-38GW", "name": "Redukcja GZ 1/2\" x GW 3/8\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-TRO-12GW", "name": "Trójnik GW 1/2\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-RED-12GW", "name": "Redukcja GZ 1\" x GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRU-34GWGZ", "name": "Śrubunek GW/GZ 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRU-01GWGZ", "name": "Śrubunek GW/GZ 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-SRU-01GW", "name": "Śrubunek GW 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOL-01GWGZ", "name": "Kolano GW/GZ 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-TRO-01GW", "name": "Trójnik GW 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-TRO-01GW12GW", "name": "Trójnik GW 1\" GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-RED-34GW", "name": "Redukcja GZ 1\" x GW 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-NYP-01GZ", "name": "Nypel GZ 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-MUF-01GW", "name": "Mufa GW 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-MUF-38GW", "name": "Mufa GW 3/8\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-MUF-12GW", "name": "Mufa GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOR-12GZ", "name": "Korek GZ 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NYP-12GZ", "name": "Nypel GZ 1/2\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NYP-12GZ38GZ", "name": "Nypel GZ 1/2\" x GZ 3/8\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NYP-12GZ14GZ", "name": "Nypel GZ 1/2\" x GZ 1/4\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NYP-38GZ", "name": "Nypel GZ 3/8\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NYP-14GZ", "name": "Nypel GZ 1/4\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-ZPR-12GW38GZ", "name": "Złączka prosta GW 1/2\" GZ 3/8\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-ZPR-12GWGZ", "name": "Złączka prosta GW/GZ 1/2\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-ZPR-38GWGZ", "name": "Złączka prosta GW GZ 3/8\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-NPP-38GZ", "name": "Nypel przedłużany GZ 3/8\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-RED-14GW", "name": "Redukcja GZ 1/2\" x GW 1/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI08-KWK-38GW", "name": "Końcówka węża kątowa 90° GW 3/8\" DN8 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI06-KWP-38GW", "name": "Końcówka węża prosta GW 3/8\" DN6 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI08-KWP-38GW", "name": "Końcówka węża prosta GW 3/8\" DN8 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI06-KWK-38GW", "name": "Końcówka węża kątowa 90° GW 3/8\" DN6 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI06-KWP-38GZ", "name": "Końcówka węża prosta GZ 3/8\" DN6 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI08-KWP-38GZ", "name": "Końcówka węża prosta GZ 3/8\" DN8 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI10-KWP-38GW", "name": "Końcówka węża prosta GW 3/8\" DN10 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI10-KWK-38GW", "name": "Końcówka węża kątowa 90° GW 3/8\" DN10 (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "CHE20-SZP-H", "name": "Szczotka Pink Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-SZD-H", "name": "Szczotka Deep Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE25-TAB", "name": "Tabletki solne (Sól) 25kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-PIY-H", "name": "Piana Yellow Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-WOS-H", "name": "Wosk Glance Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-SZA-H", "name": "Szampon Premium Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-PIW-H", "name": "Piana White Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-AKT-H", "name": "Aktywator Aroma Wash (H) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE22-FEL-N", "name": "Płyn Do Felg X-TRA Wash (N) 22kg", "stage": "6. Chemia myjniowa"}, {"code": "CHE20-AKT-N", "name": "Aktywator Aroma Wash (N) 20kg", "stage": "6. Chemia myjniowa"}, {"code": "ELE-TRM", "name": "Terminal płatniczy NAYAX VPOS TOUCH", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-WRZ", "name": "Wrzutnik monet COMESTERO RM5 EVOLUTION", "stage": "5. Elektryka i elektronika"}, {"code": "POM-OLI", "name": "Pompka Chemii INJECTA Olimpia", "stage": "7. Pompy"}, {"code": "POM-HYD", "name": "Pompka Chemii DOSATRONIC HYDRA", "stage": "7. Pompy"}, {"code": "INO-ZKU-01GW", "name": "Zawór kulowy GW 1\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-ZKU-12GW", "name": "Zawór kulowy GW 1/2\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "CHE20-DET", "name": "Detergent w proszku 300 Plus 20kg", "stage": "6. Chemia myjniowa"}, {"code": "KWA-FLT-01GW", "name": "Filtr skośny GW 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-FLT-12GW", "name": "Filtr skośny GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "INO-PSZ", "name": "Pojemnik na szczotkę (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-PLA", "name": "Pojemnik na lance (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-STO", "name": "Stojak do powieszenia dywaników (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-TRZ", "name": "Trzepaczka do dywaników (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-RAM-38", "name": "Ramię obrotowe na stanowisko 3/8\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-ZSK-14GZ", "name": "Szybkozłączka skręcana na GUEST 6/4mm GZ 1/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "WEZ06-STC45-38GWGZ", "name": "Wąż stanowiskowy DN6 termoplastyczny GW/GZ 3/8\" (czerwony) 4,5m", "stage": "2. Węże"}, {"code": "WEZ06-STN45-38GWGZ", "name": "Wąż stanowiskowy DN6 termoplastyczny GW/GZ 3/8\" (niebieski) 4,5m", "stage": "2. Węże"}, {"code": "WEZ06-SPZ-14GZ", "name": "Wąż spiralny DN6 ze złączkami obrotowymi GZ 1/4\" (żółty)", "stage": "2. Węże"}, {"code": "WEZ06-SPN-14GZ", "name": "Wąż spiralny DN6 ze złączkami obrotowymi GZ 1/4\" (niebieski)", "stage": "2. Węże"}, {"code": "WEZ08-RAM-38GZ-1SN", "name": "Wąż do ramienia DN8 3/8\" 1SN", "stage": "2. Węże"}, {"code": "WEZ06-RAM-14GZ-1SN", "name": "Wąż do ramienia DN6 1/4\" 1SN", "stage": "2. Węże"}, {"code": "WEZ06-OSL", "name": "Osłona plastikowa na wąż (odgiętka) DN6", "stage": "2. Węże"}, {"code": "WEZ25-30-01GZ", "name": "Wąż DN25 GZ 1\" 30cm (stal nierdzewna)", "stage": "2. Węże"}, {"code": "WEZ25-100-01GZ", "name": "Wąż DN25 GZ 1\" 100cm (stal nierdzewna)", "stage": "2. Węże"}, {"code": "WEZ08-STN-38GWGZ", "name": "Wąż stanowiskowy DN8 termoplastyczny GW/GZ 3/8\" (niebieski)", "stage": "2. Węże"}, {"code": "WEZ08-STC-38GWGZ", "name": "Wąż stanowiskowy DN8 termoplastyczny GW/GZ 3/8\" (czerwony)", "stage": "2. Węże"}, {"code": "WEZ10-ZAS-12GW-2SN", "name": "Wąż zasilający DN10 2SN GW 1/2\"", "stage": "2. Węże"}, {"code": "WEZ10-BYP-38GW", "name": "Wąż Bypass DN10 GW 3/8\"", "stage": "2. Węże"}, {"code": "WEZ08-RAM-38-2SN", "name": "Wąż do ramienia DN8 3/8\" 2SN", "stage": "2. Węże"}, {"code": "GUE12-RUR", "name": "GUEST Rura poliamidowa PA12H 12x9 (niebieska)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WEZ06-STC", "name": "Wąż stanowiskowy DN6 termoplastyczny (czerwony)", "stage": "2. Węże"}, {"code": "WEZ06-STN", "name": "Wąż stanowiskowy DN6 termoplastyczny (niebieski)", "stage": "2. Węże"}, {"code": "WEZ06-STZ", "name": "Wąż stanowiskowy DN6 termoplastyczny (zielony)", "stage": "2. Węże"}, {"code": "PRZ03-STE-075", "name": "Przewód sterowniczy 3G 0,75mm²", "stage": "5. Elektryka i elektronika"}, {"code": "PRZ04-STE-05", "name": "Przewód sterowniczy 4G 0,5mm²", "stage": "5. Elektryka i elektronika"}, {"code": "PRZ25-STE-15", "name": "Przewód sterowniczy 25G 1,5mm²", "stage": "5. Elektryka i elektronika"}, {"code": "PRZ03-STE-15", "name": "Przewód sterowniczy 3G 1,5mm²", "stage": "5. Elektryka i elektronika"}, {"code": "KOR-6060", "name": "Koryto grzebieniowe plastikowe 60x60 (średnie)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-6040", "name": "Koryto grzebieniowe plastikowe 60x40 (małe)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-4025", "name": "Koryto grzebieniowe plastikowe 40x25 (do panelu)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-10080", "name": "Koryto grzebieniowe plastikowe 100x80 (duże)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "GUE12-ZKA", "name": "GUEST 12mm złączka kątowa (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "AKC-OSL", "name": "Osłona gumowa na pochwę do lanc", "stage": "16. Pozostałe / akcesoria"}, {"code": "WYL10-PLY", "name": "Wyłącznik pływakowy IP68 10m", "stage": "16. Pozostałe / akcesoria"}, {"code": "WYL05-PLY", "name": "Wyłącznik pływakowy IP68 5m", "stage": "16. Pozostałe / akcesoria"}, {"code": "TUL06-1", "name": "Tuleja zaciskowa DN6 1SN", "stage": "16. Pozostałe / akcesoria"}, {"code": "TUL08-1", "name": "Tuleja zaciskowa DN8 1SN", "stage": "16. Pozostałe / akcesoria"}, {"code": "TUL10-1", "name": "Tuleja zaciskowa DN10 1SN", "stage": "16. Pozostałe / akcesoria"}, {"code": "KAN28-RUR", "name": "KAN 28\" Rura", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-UCH", "name": "Uchwyt kompletny do rur KAN 28\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-UCH", "name": "Uchwyt kompletny do rur KAN 22\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN22-RUR", "name": "KAN 22\" rura", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "POM-CAT-350", "name": "POMPA CAT 350", "stage": "7. Pompy"}, {"code": "POM-CAT-5CP", "name": "POMPA CAT 5CP2150W", "stage": "7. Pompy"}, {"code": "POM-WIL", "name": "Pompa HIMULTI WILO 3-45P", "stage": "7. Pompy"}, {"code": "ALL-OLJ", "name": "Olej 15W40", "stage": "16. Pozostałe / akcesoria"}, {"code": "ELE-WEN", "name": "Wentylator do Panelu 24VDC 60x60x25mm", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-OGZ", "name": "Element grzejny/ogrzewacz do panelu 20w 12÷30V", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-TRM-OBU", "name": "Obudowa plastikowa do terminalu NAYAX VPOS TOUCH", "stage": "5. Elektryka i elektronika"}, {"code": "PIS-MV925", "name": "Pistolet MV925 (bez spustu)", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "PIS-ST1100", "name": "Pistolet ST 1100", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "PIS-ST2300", "name": "Pistolet ST 2300", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "PIS-EW365-KPL", "name": "KOMPLET pistolet easywash 365+ wraz z lancą pianową st75", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN-OSD-14GW", "name": "Osłona dyszy lancy z gwintem 1/4\" MTM (czarna)", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "MOS-KRA-12GZ", "name": "Kran czerpalny GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-ZKS-01GZ", "name": "Zawór kulowy ze śrubunkiem GZ 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-ZKS-12GZ", "name": "Zawór kulowy ze śrubunkiem GZ 1/2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "PRZ-TAS", "name": "Przewód taśmowy do wrzutnika monet Comestero RM5", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-ZSA", "name": "Zasilacz UPS Pico 650VA", "stage": "5. Elektryka i elektronika"}, {"code": "PLA-PFW", "name": "Panel frontowy wrzutnika Comestero RM5", "stage": "4. Panel i pulpit stanowiska"}, {"code": "PLA-OCH-PFW", "name": "Klapka ochronna panelu frontowego wrzutnika Comestero z zawiasami", "stage": "4. Panel i pulpit stanowiska"}, {"code": "ELE-PRC", "name": "Przycisk do panelu na stanowisko (podświetlany)", "stage": "5. Elektryka i elektronika"}, {"code": "PYL-ROZ-Z", "name": "Pylon/kaseton dwustronny napis \"ROZMIENIARKA\" - zielony", "stage": "10. Rozmieniarka"}, {"code": "PYL-ROZ-C", "name": "Pylon/kaseton dwustronny napis \"ROZMIENIARKA\" - czerwony", "stage": "10. Rozmieniarka"}, {"code": "ELE-PI-KIT", "name": "Raspberry Pi Starter Kit", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-ROU", "name": "Router WIFI wraz z zasilaczem", "stage": "5. Elektryka i elektronika"}, {"code": "PAN-KPL", "name": "Panel na stanowisko (KOMPLETNY)", "stage": "4. Panel i pulpit stanowiska"}, {"code": "ELE-MON", "name": "Monitor/panel operatorski do panelu na stanowisko", "stage": "5. Elektryka i elektronika"}, {"code": "PAN-DRZ", "name": "Drzwi pulpitu na stanowisko", "stage": "4. Panel i pulpit stanowiska"}, {"code": "MNT-PDG-12", "name": "Podkładka metal/guma 1/2\"", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDG-14", "name": "Podkładka metal/guma 1/4\"", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDG-18", "name": "Podkładka metal/guma 1/8\"", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDG-38", "name": "Podkładka metal/guma 3/8\"", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "FIL-ODK", "name": "Filtr zbiornika odkurzacza", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ODK-OBE-40", "name": "Obejma na rurę do odkurzacza 38/40mm", "stage": "9. Odkurzacz"}, {"code": "ODK-OBR-40", "name": "Obrotówka odkurzacza plastikowa 38/40mm", "stage": "9. Odkurzacz"}, {"code": "ODK-SPL-40", "name": "Ssawka plastikowa do odkurzacza 38/40mm", "stage": "9. Odkurzacz"}, {"code": "ODK-SSI-38", "name": "Ssawka silikonowa wraz z obrotówką do odkurzacza 38mm", "stage": "9. Odkurzacz"}, {"code": "FIL32-OBF-54", "name": "Obudowa filtra Cintropur NW 32 1 1/4\" ze śrubunkami i kluczem (filtr główny)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL10-SZN", "name": "Wkład sznurkowy 10\" atlas 5 mikronów z oringiem (do osmozy)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL20-SZN", "name": "Wkład sznurkowy 20\" atlas 5 mikronów z oringiem (do osmozy)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL10-SIA", "name": "Wkład siatkowy 10\" (do filtra antymrozu)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL10-WEG", "name": "Wkład węglowy ATLAS 10\" z oringiem", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL20-WEG", "name": "Wkład węglowy ATLAS 20\" z oringiem", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL32-SIA", "name": "Wkład siatkowy cintropur NW 32 25 mik. (do filtra głównego)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "CHE25-TAB-PAL", "name": "Paleta tabletek soli 1000kg", "stage": "6. Chemia myjniowa"}, {"code": "CZU-CIS-14GZ", "name": "Czujnik ciśnienia 1-10bar GZ 1/4\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "INO-NYC-01GZ", "name": "Nypel płaskoczołowy GZ 1\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-NYC-34GZ", "name": "Nypel płaskoczołowy GZ 3/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-NYC-12GZ", "name": "Nypel płaskoczołowy GZ 1/2\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KWA-NYP-34GZ", "name": "Nypel GZ 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "CZU03-TEM", "name": "Czujnik temperatury PT-100 3-przewodowy 15m", "stage": "13. Przyrządy pomiarowe"}, {"code": "CZU-OSL-14GZ", "name": "Osłona gumowa do czujnika ciśnienia 1-10 bar GZ 1/4\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "ALL-TWD", "name": "Tester twardości wody", "stage": "16. Pozostałe / akcesoria"}, {"code": "LAN-OSP-14", "name": "Osłona dyszy lancy pianowej 1/4\"", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "ROT-ZBI-PST", "name": "Zbiornik na wodę 1000L (prostokątny)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ROT-ZBI-OKR", "name": "Zbiornik na wodę 1000L (okrągły)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZBI-ZSO", "name": "Zbiornik solanki 70L", "stage": "16. Pozostałe / akcesoria"}, {"code": "IND120-TER-12GZ", "name": "Termometr bimetaliczny 0-120°C GZ 1/2\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "IND250-MAN-14GZ", "name": "Manometr glicerynowy 0-250bar GZ 1/4\" (gwint z tyłu)", "stage": "13. Przyrządy pomiarowe"}, {"code": "IND25-MAN-14GZ", "name": "Manometr glicerynowy 0-25bar GZ 1/4\" (gwint z tyłu)", "stage": "13. Przyrządy pomiarowe"}, {"code": "IND10-MAN-14GZ", "name": "Manometr glicerynowy 0-10bar GZ 1/4\" (gwint z tyłu)", "stage": "13. Przyrządy pomiarowe"}, {"code": "LAN60-PRO-OKR", "name": "Lanca prosta z okrągłą rączką 60cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN60-PRO-SZE", "name": "Lanca prosta z sześcienną rączką 60cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "POM-ODP", "name": "Odpowietrznik pompki chemii inject", "stage": "7. Pompy"}, {"code": "LAN50-PRO-SZE", "name": "Lanca prosta z sześcienną rączką 50cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN70-ZAG-ZLO", "name": "Lanca zagięta ze żłobioną rączka 70cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN80-ZAG-SZE", "name": "Lanca zagięta z sześcienną rączką 80cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN60-ZAG-ZLO", "name": "Lanca zagięta ze żłobioną rączka 60cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "LAN40-PIA", "name": "Lanca piany KOTHAR 40cm", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-4002", "name": "Dysza LECHLER 4002", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-54803", "name": "Dysza LECHLER 54803", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-54802", "name": "Dysza LECHLER 54802", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-548075", "name": "Dysza LECHLER 548075", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-4003", "name": "Dysza LECHLER 4003", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-40045", "name": "Dysza LECHLER 40045", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-4049", "name": "Dysza LECHLER 4049", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-40030", "name": "Dysza LECHLER 40030", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-6504", "name": "Dysza LECHLER 6504", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-6556", "name": "Dysza LECHLER 6556", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "DYS-4004", "name": "Dysza LECHLER 4004", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "KWA-FLT-34GW", "name": "Filtr skośny GW 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "FIL01-OBF-34", "name": "Obudowa filtra AQUA 1\" FP39 3/4\" (do filtra antymrozu)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL20-OBF-01", "name": "Obudowa filtra Atlas 20\" przyłącze 1\" (do filtra osmozy)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL01-KLF", "name": "Klucz do obudowy filtra AQUA", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "FIL20-KLF", "name": "Klucz do obudowy filtra Atlas 20\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "LAN-SPN-14GZ", "name": "Spieniacz do lancy pianowej do szczotki GZ 1/4\"", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "POM-SKT100", "name": "Pompa głębinowa SKT100 (pompa anty-mrozu)", "stage": "7. Pompy"}, {"code": "POM-OSM", "name": "Pompa NUERT (pompa osmozy)", "stage": "7. Pompy"}, {"code": "IND-WOD-12GW", "name": "Wodomierz Antymagnetyczny DIAMOND GW 1/2\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "ZAW-PLY-34GZ", "name": "Zawór pływakowy GZ 3/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZAW-REG", "name": "Zawór regulacji ciśnienia VRT3 (sam zawór)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZAW-REG-KPL", "name": "Zawór regulacji ciśnienia VRT3 (KOMPLETNY)", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZAW-BEZ-12GW34GZ", "name": "Zawór bezpieczeństwa 8 bar GW 1/2\" GZ 3/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "IND-MAN-12GZ", "name": "Manometr grzewczy 4 bar GZ 1/2\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "POM-OSM-SPR", "name": "Sprzęgło pompy osmozy NUERT", "stage": "7. Pompy"}, {"code": "MEM-KOR", "name": "Korek do obudowy membrany wraz z uszczelkami", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ELM-ZWY-12GW", "name": "Elektrozawór membranowy zwykły GW 1/2\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ELM-ODW-12GW", "name": "Elektrozawór membranowy odwrotnego działania GW 1/2\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ELM-WCI-38GW", "name": "Elektrozawór membranowy wysokiego ciśnienia GW 3/8\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "MEM-OBU", "name": "Obudowa membrany", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "MEM-ULP21", "name": "Membrana VONTRON ULP21", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "KOT-KAT-38GW", "name": "Złącze obrotowe kątowe KOTHAR 3/8\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "KOT-PRO-38GW", "name": "Złącze obrotowe proste KOTHAR 3/8\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "KOT-KAT-14GW", "name": "Złącze obrotowe kątowe KOTHAR 1/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "KOT-PRO-14GW", "name": "Złącze obrotowe proste KOTHAR 1/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "INO-ZWR-01GW", "name": "Zawór zwrotny Mondeo 1\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-ZWR-12GW", "name": "Zawór zwrotny Mondeo 1/2\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "FIL-FPW", "name": "Filtr powietrza TWI/ TWI II", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "POD-NAC-25L", "name": "Naczynie wzbiorcze przeponowe wiszące HW 25L (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-OPA-25L", "name": "Opaska do naczynia wbiorczego przeponowego 25L (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POM-OSL-CAT350", "name": "Osłona sprzęgła pompy CAT350", "stage": "7. Pompy"}, {"code": "POM-OSL-CAT5CP", "name": "Osłona sprzęgła pompy CAT 5CP2150W", "stage": "7. Pompy"}, {"code": "POM-OSL-NUE", "name": "Osłona sprzęgła pompy NUERT (pompa osmozy)", "stage": "7. Pompy"}, {"code": "POM-SPR-CAT", "name": "Sprzęglo pomp CAT", "stage": "7. Pompy"}, {"code": "ODK-STE", "name": "Sterownik do odkurzacza", "stage": "9. Odkurzacz"}, {"code": "ODK-TUR", "name": "Turbina z zabezpieczeniem termicznym 1400W", "stage": "9. Odkurzacz"}, {"code": "MOS-ANT-02GW", "name": "Zawór antyskażeniowy GW 2\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ZAW-GLO-S", "name": "Zawór głowicy AQUA - ssący", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZAW-GLO-T", "name": "Zawór głowicy AQUA - tłoczący", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "MOS-ZWR-01GW", "name": "Zawór zwrotny z grzybkiem GW 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "POD-GBE-34", "name": "Grupa bezpieczeństwa CWU bez odpowietrznika, ze stali nierdzewnej 8 bar 3/4\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-GLO", "name": "Głowica termoelektryczna 230V M30x1,5 (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-GMI-01", "name": "Grupa mieszająca termostatyczna 1\" 2-55°C z zaworem trójdrożnym z pompą elektryczną (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-GPO-64GZ", "name": "Grupa pompowa DN25 z wymiennikiem 34 płytowym i pompą GZ 6/4\" x GW 1\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "ELE-ELD-BFC", "name": "Elektroda zapalająca do pieca BFC", "stage": "5. Elektryka i elektronika"}, {"code": "USL-PRG", "name": "Programowanie wrzutnika Comestero RM5", "stage": "15. Usługi"}, {"code": "INO-MUF-34GW", "name": "Mufa GW 3/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "GUE12-WEZ-ANT", "name": "GUEST 12mm wężyk do antymrozu (czarny)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MNT-KTW-M10", "name": "Kotwa M10x70 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-NKK-M10", "name": "Nakrętka kołpakowa M10 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-NKS-M12", "name": "Nakrętka sześciokątna M12 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-NKS-M10", "name": "Nakrętka sześciokątna M10 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-SRB-M12", "name": "Śruba sześciokątna M12x50 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDR-M12", "name": "Podkładka płaska poszerzana M12 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDK-M10", "name": "Podkładka płaska M10 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-PDK-M08", "name": "Podkładka płaska M8 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "MNT-NKS-M08", "name": "Nakrętka sześciokątna M8 (stal nierdzewna)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "KWA-LAN", "name": "Łańcuch 3mm (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-OGN", "name": "Ogniwo \"S\" do łańcucha (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "IND-MOC", "name": "Mocowanie tablicowe do manometru", "stage": "13. Przyrządy pomiarowe"}, {"code": "PAN-KLA", "name": "Klamka plastikowa do panelu na stanowisko (bez wkładki)", "stage": "4. Panel i pulpit stanowiska"}, {"code": "PAN-ZAM", "name": "Zamek do klamki do panelu na stanowisko (wkładka z kluczem)", "stage": "4. Panel i pulpit stanowiska"}, {"code": "INO-PLY-2", "name": "Płyta na pompki chemii - 2 stanowiska (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-PLY-3", "name": "Płyta na pompki chemii - 3 stanowiska (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-PLY-4", "name": "Płyta na pompki chemii - 4 stanowiska (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ELE-GLS", "name": "Głośnik soundbar MADDOG SGS300 RGB", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-WAG-1", "name": "WAGO \"1\"", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-WAG-5", "name": "WAGO \"5\"", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-WAG-2", "name": "WAGO \"2\"", "stage": "5. Elektryka i elektronika"}, {"code": "FIL-ANP-01", "name": "Filtr antypiaskowy, siatkowy 1\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "POD-ODP-38", "name": "Odpowietrznik automatyczny OTTOvent 3/8\" z zaworem stopowym 1/2\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "IND10-MAN-12GZ", "name": "Manometr radialny 100mm 0-10bar GZ 1/2\"", "stage": "13. Przyrządy pomiarowe"}, {"code": "ELE-TER", "name": "Termostat NC otwierający (rozwierany)", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-MOD", "name": "Moduł przetwornicy 6-32V do USB 5V 3.4A", "stage": "5. Elektryka i elektronika"}, {"code": "POD-OGR-04", "name": "Ogrzewanie podłogowe - 4 stanowiska (KOMPLET)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-MUR-34", "name": "Mufa redukcyjna OTTObrass 3/4\" x 1/2\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-SRU-34GZ", "name": "Śrubunek prosty OTTObrass 3/4\" x 1/2\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-TRO-12GW", "name": "Trójnik OTTObrass 1/2\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-NYP-01GZ", "name": "Nypel OTTObrass 1\" oring (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-PRD-12", "name": "Przedłużka OTTObrass 1/2\" L-40 (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-AST-34GW", "name": "złączka antyskrętna GW 3/4\" 20x2mm do rury wielowarstwowej/PE-X (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-NAC-8L", "name": "Naczynie wzbiorcze przeponowe wiszące HS 8L (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-ROZ-01", "name": "Rozdzielacz 1\" OTTOflow 4-drogowy z zaworami termostatycznymi i przepływomierzem (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POD-SZY-34GW", "name": "Szybkozłącze do naczynia przeponowego GW 3/4\" (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "ELE-KON", "name": "Końcówka 2,5 (nasuwka żeńska)", "stage": "5. Elektryka i elektronika"}, {"code": "INO-IGL-12GW", "name": "Zawór iglicowy GW 1/2\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ZTR-NAP-38", "name": "Zestaw naprawczy do zaworu trójdrożnego 3/8\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZTR-NAP-14", "name": "Zestaw naprawczy do zaworu trójdrożnego 1/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZTR-TLU-14GZ", "name": "Tłumik do zaworu trójdrożnego GZ 1/4\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "INO-ZWR-14GW", "name": "Zawór zwrotny PA 1/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-ZWR-38GW", "name": "Zawór zwrotny PA 3/8\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ZMI-SIT", "name": "Sitko do kolumny zmiękczacza", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ZMI-GLO", "name": "Głowica kolumny zmiękczacza CLACK WS1CK TWIN", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "PAN-NAK", "name": "Naklejka na panel frontowy na stanowisko (indywidualna)", "stage": "4. Panel i pulpit stanowiska"}, {"code": "ZMI-KOL", "name": "Kolumna zmiękczacza", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "CHE20-GLI", "name": "Glikol", "stage": "6. Chemia myjniowa"}, {"code": "INO-ZTR-14GW", "name": "Zawór trójdrożny GW 1/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "GUE10-WEZ", "name": "GUEST 10mm wężyk", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOL-01GW", "name": "Kolano GW 1\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "PLF-UCH-16", "name": "Uchwyt do platformy BAKS 16cm (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "PLF-BAZ-30020", "name": "Platforma stalowa 300 x 20 (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "PLF-POK-30020", "name": "Pokrywa/zastawka platformy stalowej 300 x 20 (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-POK-6060", "name": "Pokrywa/zastawka koryta grzebieniowego 60x60", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-POK-6040", "name": "Pokrywa/zastawka koryta grzebieniowego 60x40", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "KOR-POK-10080", "name": "Pokrywa/zastawka koryta grzebieniowego 100x80", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "PIE-TWI35200", "name": "Piec TWI 35-200 35KW 200L", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-TWI-KPL", "name": "Komin TWISTER (KOMPLET)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-RUR-1", "name": "Rura kwas turbo II Fi 80/125 1mb", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-RUR-05", "name": "Rura kwas turbo II Fi 80/125 0,5mb", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-RUR-033", "name": "Rura kwas turbo II Fi 80/125 0,33mb", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-KOL", "name": "Kolano kwas turbo II Fi 80/125 90°", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-OKA", "name": "Okapnik/maskownica Kwas Fi 125", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-ZAK-025", "name": "Zakończenie boczne Kwas Turbo II Fi 80/125 0,25mb", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "KOM-ACV", "name": "Komin do kotła ACV", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "POM-HYD460", "name": "Pompa Hydroo HX 4-60 230V", "stage": "7. Pompy"}, {"code": "ODK-DWS-KPL", "name": "Odkurzacz dwustanowiskowy (KOMPLETNY)", "stage": "9. Odkurzacz"}, {"code": "ODK-NAK", "name": "Naklejka na odkurzacz", "stage": "9. Odkurzacz"}, {"code": "WEZ-ODK-50", "name": "Wąż do odkurzacza 38/50", "stage": "2. Węże"}, {"code": "INO-STL-SAM", "name": "Stelaż Myjni - 3 stanowiska (sam stelaż) (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-MON-STD", "name": "Moneciarka z podstawką do panelu STD (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-TRO-38GZ", "name": "Trójnik BBB BSP GZ 3/8\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-TRO-14GZ", "name": "Trójnik BBB BSP GZ 1/4\" (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ELM-ZNA", "name": "Zestaw naprawczy Elektrozaworu GSPU-15V", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ROT-WSK", "name": "Wskaźnik poziomu wody do zbiorników ROTEX 0-200cm", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "ROT-ZPZ", "name": "Zestaw przyłączeniowy do zbiorników ROTEX", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "RWM-STD", "name": "Rozmieniarka standard", "stage": "10. Rozmieniarka"}, {"code": "RWM-PRE", "name": "Rozmieniarka premium", "stage": "10. Rozmieniarka"}, {"code": "INO-STL-DOS4040", "name": "Dostawka do stelażu myjni 40x40 (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ODK-PRK-DWK", "name": "Przekaźnik dwukanałowy do sterownika odkurzacza", "stage": "9. Odkurzacz"}, {"code": "ELE-WLA-POJ", "name": "Włącznik/wyłącznik światła - pojedyńczy", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-GNI-PDW", "name": "Gniazdko - podwójne", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-GNI-POJ", "name": "Gniazdko - pojedyncze", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-STE-ST01", "name": "Sterownik pompy C.O. ST-01", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-LIS-3G", "name": "Listwa/Przedłużacz elektryczny na 3 gniazdka 1,5m", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-KAR-32GB", "name": "Karta Pamięci 32GB SANDISK ULTRA", "stage": "5. Elektryka i elektronika"}, {"code": "POM-SKT200", "name": "Pompa głębinowa SKT200 (pompa anty-mrozu)", "stage": "7. Pompy"}, {"code": "INO-LIM-PRA", "name": "Listwa mieszająca - Prawa (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "INO-LIM-LEW", "name": "Listwa mieszająca - Lewa (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ELE-PUS", "name": "Puszka elektryczna", "stage": "5. Elektryka i elektronika"}, {"code": "POM-CAT5CP-USZ", "name": "Uszczelniacze wodne pompy CAT 5CP (komplet)", "stage": "7. Pompy"}, {"code": "POM-CAT350-USZ", "name": "Uszczelniacze wodne pompy CAT 350 (komplet)", "stage": "7. Pompy"}, {"code": "KAN28-UCH-KWA", "name": "Uchwyt kompletny do rur KAN 28\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ODK-GNI", "name": "Gniazdo odkurzacza łączące wąż ze zbiornikiem", "stage": "9. Odkurzacz"}, {"code": "GUE22-ZAB", "name": "GUEST 22mm Zabezpieczenie", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-ZKA-12GW", "name": "KAN 28\" Złączka kątowa GW 1/2\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KAN28-KOL-1K-34GW", "name": "KAN 28\" Kolano 1x kielich GW 3/4\"", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ELE-ELD-TWI", "name": "Elektroda zapalająca do TWI II", "stage": "5. Elektryka i elektronika"}, {"code": "ALL-ZYW", "name": "Żywica do uszczelniania metalowych połączeń gwintowych", "stage": "16. Pozostałe / akcesoria"}, {"code": "ALL-NIC", "name": "LOCTITE nić do uszczelniania gwintów", "stage": "16. Pozostałe / akcesoria"}, {"code": "KAN28-MUF-45", "name": "KAN 28\" Mufa gięta 45° (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WEZ-ODK-ZBR", "name": "Wąż do odkurzacza ze zbrojeniem 1m", "stage": "2. Węże"}, {"code": "ELE-PRE-PM1", "name": "Presostat PM1 GRUNDFOS", "stage": "5. Elektryka i elektronika"}, {"code": "ORG-1022-VIT", "name": "Oring 10x2,2 VITON (zielony)", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "ORG-3625-EPD", "name": "Oring 36x2,5 EPDM", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "ORG-4015-EPD", "name": "Oring 40x1,5 EPDM", "stage": "12. Osprzęt montażowy (śruby, oringi)"}, {"code": "SZC09-MTM-14GW", "name": "Szczotka 9cm MTM GW 1/4\" (włos naturalny)", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "INJ-TFO-ST75", "name": "Injector turbo foam ST-75 (do szczotki)", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "POM-CAT5CP-KOR", "name": "Korek wlewu oleju do pompy CAT 5CP", "stage": "7. Pompy"}, {"code": "LAN-SIT", "name": "Sitko lancy pianowej", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "KOM-ROZ-125", "name": "Rozeta wybłyszczana FI 125", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "ODK-SZM", "name": "Szczotka silnika do odkurzacza", "stage": "9. Odkurzacz"}, {"code": "ODK-ZAM", "name": "Zamek do odkurzacza", "stage": "9. Odkurzacz"}, {"code": "PIS-ST2300-NAP", "name": "Zestaw naprawczy do pistoletu ST-2300", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "IND-ROP", "name": "Rotametr panelowy", "stage": "13. Przyrządy pomiarowe"}, {"code": "INJ-DOZ15-14", "name": "Injector piany 1,5mm 1/4\"", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "INJ-KOT12-38", "name": "Injector chemii KOTHAR 1.2mm 3/8\"", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "ELE-SIL-INN", "name": "Silnik elektryczny INNOMOTICS", "stage": "5. Elektryka i elektronika"}, {"code": "KWA-RED-34GZ", "name": "Redukcja GZ 3/4\" x GW 1/2\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "PRZ-EKR", "name": "Przewód ekranowy 4G 2,5mm² (srebrny)", "stage": "5. Elektryka i elektronika"}, {"code": "POM-WIB-CAT", "name": "Wibroizolator/nóżka pod pompę CAT", "stage": "7. Pompy"}, {"code": "POM-WIB-ALL", "name": "Wibroizolator/nóżka pod pompę wilo/silnik/osmozę", "stage": "7. Pompy"}, {"code": "WEZ40-ODS", "name": "Wąż do odsysu monet ALIFLEX 40mm", "stage": "2. Węże"}, {"code": "GUE12-WEZ", "name": "GUEST 12mm wężyk (przeźroczysty)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-WEZ", "name": "GUEST Wężyk 8mm (przeźroczysty)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-WEZ", "name": "GUEST Wężyk 6mm (przeźroczysty)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ALL-SZC", "name": "Szczeliwo do uszczelniania rur/złączek WURTH", "stage": "16. Pozostałe / akcesoria"}, {"code": "CHE10-KWA", "name": "Kwasek cytrynowy 10kg", "stage": "6. Chemia myjniowa"}, {"code": "WEZ06-STC55-38GWGZ", "name": "Wąż stanowiskowy DN6 termoplastyczny GW/GZ 3/8\" (czerwony) 5,5m", "stage": "2. Węże"}, {"code": "WEZ06-STN55-38GWGZ", "name": "Wąż stanowiskowy DN6 termoplastyczny GW/GZ 3/8\" (niebieski) 5,5m", "stage": "2. Węże"}, {"code": "POM-CAT350-KOR", "name": "Korek wlewu oleju do pompy CAT 350", "stage": "7. Pompy"}, {"code": "PRZ-UZI", "name": "Przewód uziemienia H07V-K", "stage": "5. Elektryka i elektronika"}, {"code": "KWA-NYR-12GZ14GZ", "name": "Nypel redukcyjny GZ 1/2\" x GZ 1/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "IND-UCH", "name": "Uchwyt do mocowania manometru MG3", "stage": "13. Przyrządy pomiarowe"}, {"code": "WIB-STE", "name": "Wibroizolator/nóżka pod stelaż W-70 M12x80", "stage": "16. Pozostałe / akcesoria"}, {"code": "INO-ZBI-CHE", "name": "Zbiornik na chemię - 6 komorowy (stal nierdzewna)", "stage": "11. Konstrukcja, stelaż, platformy"}, {"code": "ZAW-TER-01GZ", "name": "Termostatyczny zawór mieszający ATM563 GZ 1\"", "stage": "14. Filtracja / osmoza / zawory"}, {"code": "KWA-KOL-34GW", "name": "Kolano GW 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "KWA-KOL-34GWGZ", "name": "Kolano GW/GZ 3/4\" (stal kwasoodporna)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ELE-LED", "name": "Wyświetlacz LED", "stage": "5. Elektryka i elektronika"}, {"code": "LAN-SPN-ST75", "name": "Końcówka spieniająca ST-75 (bez dyszy)", "stage": "3. Lance, pistolety, dysze, szczotki"}, {"code": "ELE-PRE-PMP", "name": "Presostat GRUNDFOS PM PLUS", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-PRE-LAC", "name": "Łącznik presostatu, złącze śrubowe 1\"", "stage": "5. Elektryka i elektronika"}, {"code": "POD-PRZ-ZES", "name": "Zestaw przyłączeniowy 1\" - bez grupy mieszającej (podłogówka)", "stage": "8. Kotłownia, ogrzewanie, komin"}, {"code": "WEZ-KAR", "name": "Rura karbowana nierdzewna FI 25", "stage": "2. Węże"}, {"code": "MOS-RED-GW1", "name": "Redukcja GZ 2\" x GW 1\" (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "MOS-SRU-01GWGZ", "name": "Śrubunek 1\" GW/GZ (mosiądz)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WCI-KOR-14GZ", "name": "Korek GZ 1/4\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "WEZ-OTU-S", "name": "Otulina węża 35/9 (szara)", "stage": "2. Węże"}, {"code": "WEZ-OTU-C", "name": "Otulina węża 35/9 (czerwona)", "stage": "2. Węże"}, {"code": "WEZ-ODK-40", "name": "Wąż do odkurzacza 38/40", "stage": "2. Węże"}, {"code": "RAM-SPR", "name": "Sprężyna do ramienia", "stage": "16. Pozostałe / akcesoria"}, {"code": "WCI-KOR-12GZ", "name": "Korek GZ 1/2\" (wysokie ciśnienie)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "ELE-ZUG", "name": "Złączka elektryczna ZUG", "stage": "5. Elektryka i elektronika"}, {"code": "PAN-SEJ", "name": "Sejf do pulpitu panelu na stanowisko", "stage": "4. Panel i pulpit stanowiska"}, {"code": "PAN-PUL-STD", "name": "Pulpit STD bez sejfu podświetlane boki", "stage": "4. Panel i pulpit stanowiska"}, {"code": "PRZ-TRM", "name": "Przewód do terminalu NAYAX VPOS TOUCH", "stage": "5. Elektryka i elektronika"}, {"code": "ELE-WAP-2", "name": "Złączka przelotowa WAGO 2-przewodowa (do panelu)", "stage": "5. Elektryka i elektronika"}, {"code": "PAN-PRK-WSP", "name": "Przekaźnik wąskoprofilowy do panelu", "stage": "4. Panel i pulpit stanowiska"}, {"code": "WEZ06-CIS-1SN", "name": "Wąż ciśnieniowy DURAJET DN6 1SN 220 BAR", "stage": "2. Węże"}, {"code": "WEZ08-CIS-1SN", "name": "Wąż ciśnieniowy DURAJET DN8 1SN 220 BAR", "stage": "2. Węże"}, {"code": "GUE06-TRO", "name": "GUEST 6mm Trójnik", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}];
+// ===== Stan aplikacji =====
+let view = 'stage'; // 'stage' | 'summary' | 'cennik' | 'uwagi' | 'kosz'
+let currentStage = null;
 
-  <footer class="sticky-footer">
-    <span id="stageLabel">Stanowisko 4</span>
-    <span id="grandTotal" class="grand-total">0,00 zł</span>
-  </footer>
+function lsGet(key, fallback){
+  try{ const v = localStorage.getItem(key); return v===null?fallback:JSON.parse(v); }catch(e){ return fallback; }
+}
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function lsDel(key){ try{ localStorage.removeItem(key); }catch(e){} }
+function isObj(v){ return v && typeof v==='object' && !Array.isArray(v); }
 
-  <!-- Modal do edycji kodu produktu -->
-  <div id="editCodeModal" class="modal-overlay">
-    <div class="modal-content">
-      <h3>Zmień kod produktu</h3>
-      <input id="editCodeInput" type="text" placeholder="Nowy kod" />
-      <div class="modal-buttons">
-        <button class="secondary-btn" onclick="closeEditCodeModal()">Anuluj</button>
-        <button class="nav-btn" onclick="saveEditCode()">Zapisz</button>
+// Stanowiska: [{id, name}] — id zgodne ze starymi kluczami (ekw_bom_2 itd.)
+let stations = lsGet('ekw_stations', null);
+if(!Array.isArray(stations) || !stations.length || !stations.every(s=>isObj(s) && s.id)){
+  stations = [2,3,4,5,6].map(n=>({id:String(n), name:n+' stanowiska'}));
+}
+let currentStation = (stations.find(s=>s.id==='4') || stations[0]).id;
+
+let prices = lsGet('ekw_prices', {}); if(!isObj(prices)) prices = {};
+let customItems = lsGet('ekw_custom', []); if(!Array.isArray(customItems)) customItems = [];
+customItems = customItems.filter(i=>isObj(i) && i.code && i.name);
+let stageOverride = lsGet('ekw_stage_override', {}); if(!isObj(stageOverride)) stageOverride = {};
+let extraStages = lsGet('ekw_extra_stages', []); if(!Array.isArray(extraStages)) extraStages = [];
+extraStages = extraStages.filter(s=>typeof s==='string' && s.trim());
+let itemEdits = lsGet('ekw_item_edits', {}); if(!isObj(itemEdits)) itemEdits = {};   // klucz -> {name, code}
+let hiddenItems = lsGet('ekw_hidden_items', []); if(!Array.isArray(hiddenItems)) hiddenItems = []; // usunięte pozycje bazowe
+let boms = {}, notes = {};
+stations.forEach(s=>{
+  const b = lsGet('ekw_bom_'+s.id, {}); boms[s.id] = isObj(b)?b:{};
+  const n = lsGet('ekw_notes_'+s.id, ''); notes[s.id] = typeof n==='string'?n:'';
+});
+
+function saveStations(){ lsSet('ekw_stations', stations); }
+function saveBom(id){ lsSet('ekw_bom_'+id, boms[id]); }
+function savePrices(){ lsSet('ekw_prices', prices); }
+function saveCustom(){ lsSet('ekw_custom', customItems); }
+function saveOverride(){ lsSet('ekw_stage_override', stageOverride); }
+function saveExtra(){ lsSet('ekw_extra_stages', extraStages); }
+function saveEdits(){ lsSet('ekw_item_edits', itemEdits); }
+function saveHidden(){ lsSet('ekw_hidden_items', hiddenItems); }
+function saveNotes(id){ lsSet('ekw_notes_'+id, notes[id]); }
+
+// ===== Pomocnicze =====
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function js(v){ return esc(JSON.stringify(v)); } // bezpieczny argument do onclick="..."
+function money(v){ return v.toFixed(2).replace('.', ',')+' zł'; }
+function stationName(id){ const s = stations.find(x=>x.id===id); return s?s.name:''; }
+
+const hiddenSet = () => new Set(hiddenItems);
+function allItems(){ const h = hiddenSet(); return BASE_CATALOG.filter(i=>!h.has(i.code)).concat(customItems); }
+function isCustom(item){ return String(item.code).startsWith('WLASNY-'); }
+function itemName(item){ return (itemEdits[item.code] && itemEdits[item.code].name) || item.name; }
+function itemCode(item){
+  const e = itemEdits[item.code];
+  if(e && e.code !== undefined) return e.code;
+  return isCustom(item) ? '' : item.code;
+}
+function effStage(item){ return stageOverride[item.code] || item.stage; }
+function allStages(){
+  const s = new Set(extraStages);
+  allItems().forEach(i=>s.add(effStage(i)));
+  return [...s].sort((a,b)=>a.localeCompare(b,'pl',{numeric:true}));
+}
+function ensureStage(){
+  const list = allStages();
+  if(!currentStage || !list.includes(currentStage)) currentStage = list[0] || null;
+}
+
+// ===== Okno dialogowe (edycja) =====
+let modalSave = null;
+function openModal(title, fields, onSave, saveLabel){
+  let h = `<div class="modal-box" onclick="event.stopPropagation()"><h3>${esc(title)}</h3>`;
+  fields.forEach(f=>{
+    h += `<label class="mf"><span>${esc(f.label)}</span>`;
+    if(f.type==='select'){
+      h += `<select id="mf_${f.id}">${f.options.map(o=>`<option value="${esc(o.value)}" ${o.value===f.value?'selected':''}>${esc(o.label)}</option>`).join('')}</select>`;
+    } else if(f.type==='info'){
+      h += `<div class="hint" style="margin:0">${esc(f.value)}</div>`;
+    } else {
+      h += `<input id="mf_${f.id}" type="${f.type||'text'}" ${f.step?`step="${f.step}"`:''} value="${esc(f.value==null?'':f.value)}" placeholder="${esc(f.placeholder||'')}">`;
+    }
+    h += `</label>`;
+  });
+  h += `<div class="modal-actions"><button class="nav secondary" onclick="closeModal()">Anuluj</button>
+    <button class="nav" onclick="submitModal()">${esc(saveLabel||'Zapisz')}</button></div></div>`;
+  const m = document.getElementById('modal');
+  m.innerHTML = h; m.style.display = 'flex';
+  modalSave = ()=>{
+    const vals = {};
+    fields.forEach(f=>{ const el = document.getElementById('mf_'+f.id); if(el) vals[f.id] = el.value; });
+    return onSave(vals);
+  };
+  const first = m.querySelector('input,select'); if(first) setTimeout(()=>first.focus(), 30);
+}
+function submitModal(){ if(modalSave && modalSave()===false) return; closeModal(); render(); }
+function closeModal(){ const m = document.getElementById('modal'); m.style.display='none'; m.innerHTML=''; modalSave=null; }
+document.addEventListener('keydown', e=>{
+  const m = document.getElementById('modal');
+  if(m.style.display!=='flex') return;
+  if(e.key==='Escape') closeModal();
+  if(e.key==='Enter' && e.target.tagName==='INPUT') submitModal();
+});
+
+// ===== Stanowiska =====
+function addStation(){
+  openModal('Nowe stanowisko', [{id:'name', label:'Nazwa stanowiska', value:'', placeholder:'np. 7 stanowisk'}], v=>{
+    const name = v.name.trim(); if(!name){ alert('Podaj nazwę.'); return false; }
+    let id = 's'+Date.now();
+    stations.push({id, name}); boms[id] = {}; notes[id] = '';
+    saveStations(); currentStation = id; view = 'stage';
+  }, 'Dodaj');
+}
+function addStationCopy(){
+  const src = currentStation;
+  openModal('Kopiuj stanowisko', [
+    {id:'info', label:'Źródło', type:'info', value:stationName(src)+' (zaznaczone pozycje, ilości i uwagi)'},
+    {id:'name', label:'Nazwa nowego stanowiska', value:stationName(src)+' (kopia)'}
+  ], v=>{
+    const name = v.name.trim(); if(!name){ alert('Podaj nazwę.'); return false; }
+    const id = 's'+Date.now();
+    stations.push({id, name}); boms[id] = JSON.parse(JSON.stringify(boms[src]||{})); notes[id] = notes[src]||'';
+    saveStations(); saveBom(id); saveNotes(id); currentStation = id; view='stage';
+  }, 'Kopiuj');
+}
+function renameStation(id){
+  const s = stations.find(x=>x.id===id); if(!s) return;
+  openModal('Zmień nazwę stanowiska', [{id:'name', label:'Nazwa stanowiska', value:s.name}], v=>{
+    const name = v.name.trim(); if(!name){ alert('Podaj nazwę.'); return false; }
+    s.name = name; saveStations();
+  });
+}
+function deleteStation(id){
+  if(stations.length<=1){ alert('Musi zostać przynajmniej jedno stanowisko.'); return; }
+  if(!confirm('Usunąć stanowisko „'+stationName(id)+'” razem z jego spisem i uwagami?')) return;
+  stations = stations.filter(x=>x.id!==id);
+  delete boms[id]; delete notes[id]; lsDel('ekw_bom_'+id); lsDel('ekw_notes_'+id);
+  saveStations();
+  if(currentStation===id) currentStation = stations[0].id;
+  render();
+}
+function moveStation(id, dir){
+  const i = stations.findIndex(x=>x.id===id), j = i+dir;
+  if(i<0 || j<0 || j>=stations.length) return;
+  [stations[i], stations[j]] = [stations[j], stations[i]]; saveStations(); render();
+}
+
+// ===== Kategorie =====
+function stageOptions(selected, exclude){
+  return allStages().filter(s=>s!==exclude).map(s=>({value:s, label:s}));
+}
+function addCategory(){
+  openModal('Nowa kategoria', [{id:'name', label:'Nazwa kategorii', value:'', placeholder:'np. 17. Oświetlenie'}], v=>{
+    const name = v.name.trim(); if(!name){ alert('Podaj nazwę.'); return false; }
+    if(!allStages().includes(name)){ extraStages.push(name); saveExtra(); }
+    currentStage = name; view='stage';
+  }, 'Dodaj');
+}
+function renameStage(oldName){
+  openModal('Zmień nazwę kategorii', [{id:'name', label:'Nazwa kategorii', value:oldName}], v=>{
+    const newName = v.name.trim(); if(!newName){ alert('Podaj nazwę.'); return false; }
+    if(newName===oldName) return;
+    allItems().forEach(i=>{ if(effStage(i)===oldName) stageOverride[i.code] = newName; });
+    extraStages = extraStages.filter(s=>s!==oldName);
+    if(!extraStages.includes(newName)) extraStages.push(newName);
+    saveExtra(); saveOverride();
+    if(currentStage===oldName) currentStage = newName;
+  });
+}
+function deleteStage(name){
+  const items = allItems().filter(i=>effStage(i)===name);
+  const removeCat = ()=>{ extraStages = extraStages.filter(s=>s!==name); saveExtra(); if(currentStage===name) currentStage=null; };
+  if(!items.length){
+    if(!confirm('Usunąć pustą kategorię „'+name+'”?')) return;
+    removeCat(); render(); return;
+  }
+  const opts = [{value:'__delete__', label:'Usuń wszystkie produkty z tej kategorii'}]
+    .concat(stageOptions(null, name).map(o=>({value:o.value, label:'Przenieś do: '+o.label})));
+  openModal('Usuń kategorię', [
+    {id:'info', label:'Kategoria', type:'info', value:name+' — produktów: '+items.length},
+    {id:'action', label:'Co zrobić z produktami?', type:'select', value:'__delete__', options:opts}
+  ], v=>{
+    if(v.action==='__delete__'){
+      if(!confirm('Na pewno usunąć '+items.length+' produktów? Produkty z katalogu bazowego będzie można przywrócić z „Kosza”.')) return false;
+      items.forEach(i=>removeItemData(i.code));
+      saveAllAfterRemove();
+    } else {
+      items.forEach(i=>{ stageOverride[i.code] = v.action; }); saveOverride();
+    }
+    removeCat();
+  }, 'Usuń kategorię');
+}
+
+// ===== Produkty =====
+function editItem(key){
+  const item = allItems().find(i=>i.code===key); if(!item) return;
+  const fields = [
+    {id:'name', label:'Nazwa produktu', value:itemName(item)},
+    {id:'code', label:'Kod / SKU', value:itemCode(item), placeholder:'opcjonalnie'},
+    {id:'stage', label:'Kategoria', type:'select', value:effStage(item), options:stageOptions().concat([{value:'__new__', label:'+ nowa kategoria…'}])},
+    {id:'newStage', label:'Nazwa nowej kategorii (gdy wybrano „+ nowa kategoria”)', value:''},
+    {id:'price', label:'Cena jednostkowa (zł)', type:'number', step:'0.01', value:prices[key]!==undefined?prices[key]:''}
+  ];
+  openModal('Edytuj produkt', fields, v=>{
+    const name = v.name.trim(); if(!name){ alert('Nazwa nie może być pusta.'); return false; }
+    const code = v.code.trim();
+    const dup = allItems().find(i=>i.code!==key && code && itemCode(i)===code);
+    if(dup && !confirm('Kod „'+code+'” ma już produkt: '+itemName(dup)+'. Zapisać mimo to?')) return false;
+    let stage = v.stage;
+    if(stage==='__new__'){ stage = v.newStage.trim(); if(!stage){ alert('Podaj nazwę nowej kategorii.'); return false; } }
+    const e = {};
+    if(name!==item.name) e.name = name;
+    if(code!==(isCustom(item)?'':item.code)) e.code = code;
+    if(Object.keys(e).length) itemEdits[key] = e; else delete itemEdits[key];
+    if(stage!==item.stage) stageOverride[key] = stage; else delete stageOverride[key];
+    const p = String(v.price).replace(',', '.');
+    if(p==='') delete prices[key]; else prices[key] = parseFloat(p)||0;
+    saveEdits(); saveOverride(); savePrices();
+    currentStage = stage;
+  });
+}
+function removeItemData(key){
+  if(isCustom({code:key})){
+    customItems = customItems.filter(i=>i.code!==key);
+    delete prices[key]; delete stageOverride[key]; delete itemEdits[key];
+    stations.forEach(s=>{ delete boms[s.id][key]; });
+  } else {
+    if(!hiddenItems.includes(key)) hiddenItems.push(key);
+    stations.forEach(s=>{ if(boms[s.id][key]) boms[s.id][key].active = false; });
+  }
+}
+function saveAllAfterRemove(){
+  saveCustom(); savePrices(); saveOverride(); saveEdits(); saveHidden();
+  stations.forEach(s=>saveBom(s.id));
+}
+function deleteItem(key){
+  const item = allItems().find(i=>i.code===key); if(!item) return;
+  const msg = isCustom(item) ? 'Usunąć produkt „'+itemName(item)+'” na stałe?'
+    : 'Usunąć produkt „'+itemName(item)+'” ze spisu? (można go przywrócić z „Kosza”)';
+  if(!confirm(msg)) return;
+  removeItemData(key); saveAllAfterRemove(); render();
+}
+function restoreItem(key){ hiddenItems = hiddenItems.filter(k=>k!==key); saveHidden(); render(); }
+function restoreAll(){ if(!confirm('Przywrócić wszystkie usunięte produkty?')) return; hiddenItems = []; saveHidden(); view='stage'; render(); }
+
+function itemRow(station, item, stagesList){
+  const bom = boms[station];
+  const rec = bom[item.code] || {active:false, qty:0};
+  const price = prices[item.code] !== undefined ? prices[item.code] : '';
+  const value = (rec.active ? (rec.qty||0) * (parseFloat(price)||0) : 0);
+  const k = js(item.code);
+  const stageOpts = stagesList.map(s=>`<option value="${esc(s)}" ${effStage(item)===s?'selected':''}>${esc(s)}</option>`).join('');
+  const code = itemCode(item);
+  return `<tr class="${rec.active?'':'inactive'}">
+    <td><input type="checkbox" ${rec.active?'checked':''} onchange="toggleActive(${js(station)},${k},this.checked)"></td>
+    <td class="code">${isCustom(item)?'<span title="Produkt własny">✏️</span> ':''}${esc(code)||'<span style="color:var(--muted)">—</span>'}</td>
+    <td>${esc(itemName(item))}</td>
+    <td><select class="stage-select" onchange="moveItem(${k},this.value)">${stageOpts}<option value="__new__">+ nowa kategoria…</option></select></td>
+    <td><input type="number" min="0" step="1" value="${rec.qty||0}" onchange="setQty(${js(station)},${k},this.value)"></td>
+    <td><input type="number" min="0" step="0.01" class="price-input" value="${price}" placeholder="—" onchange="setPrice(${k},this.value)"></td>
+    <td style="text-align:right; font-weight:600; white-space:nowrap;">${money(value)}</td>
+    <td class="row-actions"><button class="icon" onclick="editItem(${k})" title="Edytuj">✎</button><button class="danger" onclick="deleteItem(${k})" title="Usuń">✕</button></td>
+  </tr>`;
+}
+
+function toggleActive(station, code, checked){
+  const bom = boms[station];
+  if(!bom[code]) bom[code] = {active:false, qty:1};
+  bom[code].active = checked;
+  if(checked && !bom[code].qty) bom[code].qty = 1;
+  saveBom(station); render();
+}
+function setQty(station, code, val){
+  const bom = boms[station];
+  if(!bom[code]) bom[code] = {active:true, qty:0};
+  bom[code].qty = parseFloat(val)||0;
+  saveBom(station); render();
+}
+function setPrice(code, val){
+  if(val==='') delete prices[code]; else prices[code] = parseFloat(val);
+  savePrices(); render();
+}
+function moveItem(code, newStage){
+  if(newStage==='__new__'){
+    openModal('Nowa kategoria', [{id:'name', label:'Nazwa nowej kategorii', value:''}], v=>{
+      const name = v.name.trim(); if(!name){ alert('Podaj nazwę.'); return false; }
+      stageOverride[code] = name; saveOverride();
+    }, 'Przenieś');
+    render(); return;
+  }
+  stageOverride[code] = newStage;
+  saveOverride(); render();
+}
+
+function addCustomItem(station, stage){
+  const nameEl = document.getElementById('newName');
+  const name = nameEl.value.trim();
+  if(!name){ nameEl.focus(); return; }
+  const code = document.getElementById('newCode').value.trim();
+  const qty = parseFloat(document.getElementById('newQty').value)||1;
+  const price = parseFloat(String(document.getElementById('newPrice').value).replace(',', '.'))||0;
+  const key = 'WLASNY-' + Date.now();
+  customItems.push({code:key, name, stage});
+  if(code){ itemEdits[key] = {code}; saveEdits(); }
+  prices[key] = price;
+  boms[station][key] = {active:true, qty:qty};
+  saveCustom(); savePrices(); saveBom(station);
+  render();
+}
+
+// ===== Sumy =====
+function stageTotal(station, stage){
+  const bom = boms[station]; let t=0;
+  allItems().filter(i=>effStage(i)===stage).forEach(i=>{
+    const rec = bom[i.code];
+    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
+  });
+  return t;
+}
+function grandTotal(station){
+  const bom = boms[station]; let t=0;
+  allItems().forEach(i=>{
+    const rec = bom[i.code];
+    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
+  });
+  return t;
+}
+function stageHasItems(stage, station){
+  const bom = boms[station];
+  return allItems().filter(i=>effStage(i)===stage).some(i=> bom[i.code] && bom[i.code].active);
+}
+function parseCennik(text){
+  const map = {};
+  BASE_CATALOG.concat(customItems).forEach(i=>{ map[i.code] = i.code; const c = itemCode(i); if(c) map[c] = i.code; });
+  const lines = text.split(/\n/); let updated=0;
+  lines.forEach(line=>{
+    const parts = line.split(/\t|;/).map(s=>s.trim());
+    if(parts.length>=2){
+      const key = map[parts[0]] || parts[0];
+      const p = parseFloat(parts[1].replace(',', '.').replace(/[^0-9.]/g,''));
+      if(parts[0] && !isNaN(p)){ prices[key]=p; updated++; }
+    }
+  });
+  savePrices();
+  return updated;
+}
+
+// ===== Widok =====
+function render(){
+  ensureStage();
+  const stagesList = allStages();
+  const cs = js(currentStation);
+  document.getElementById('tabs').innerHTML = stations.map(s=>{
+    const act = s.id===currentStation;
+    return `<span class="tab-wrap ${act?'active':''}"><button class="tab-btn ${act?'active':''}" onclick="selectStation(${js(s.id)})">${esc(s.name)}</button>${act?
+      `<button class="tab-ic" onclick="renameStation(${js(s.id)})" title="Zmień nazwę stanowiska">✎</button><button class="tab-ic" onclick="moveStation(${js(s.id)},-1)" title="Przesuń w lewo">‹</button><button class="tab-ic" onclick="moveStation(${js(s.id)},1)" title="Przesuń w prawo">›</button><button class="tab-ic" onclick="deleteStation(${js(s.id)})" title="Usuń stanowisko">✕</button>`:''}</span>`;
+  }).join('') + `<button class="tab-btn add" onclick="addStation()" title="Dodaj stanowisko">+ stanowisko</button><button class="tab-btn add" onclick="addStationCopy()" title="Kopiuj bieżące stanowisko">⧉ kopiuj</button>`;
+
+  let html = '<div class="stage-nav no-print">';
+  stagesList.forEach(st=>{
+    const active = (st===currentStage && view==='stage');
+    const done = stageHasItems(st, currentStation);
+    html += `<span class="stage-chip ${active?'active':''} ${done?'done':''}">
+      <span onclick="selectStage(${js(st)})">${esc(st)}</span>
+      <span class="edit-ic" onclick="renameStage(${js(st)})" title="Zmień nazwę">✎</span>
+      <span class="edit-ic" onclick="deleteStage(${js(st)})" title="Usuń kategorię">✕</span>
+    </span>`;
+  });
+  html += `<button class="small" onclick="addCategory()">+ kategoria</button>`;
+  html += `<button class="stage-chip ${view==='cennik'?'active':''}" onclick="setView('cennik')">💰 Cennik</button>`;
+  html += `<button class="stage-chip ${view==='uwagi'?'active':''}" onclick="setView('uwagi')">📝 Uwagi</button>`;
+  html += `<button class="stage-chip ${view==='summary'?'active':''}" onclick="setView('summary')">📋 Podsumowanie</button>`;
+  if(hiddenItems.length) html += `<button class="stage-chip ${view==='kosz'?'active':''}" onclick="setView('kosz')">🗑 Kosz (${hiddenItems.length})</button>`;
+  html += `</div>`;
+
+  if(view==='cennik'){
+    html += `<div class="card"><h3>Wklej cennik z wFirma</h3>
+      <p class="hint">Wklej dwie kolumny: kod SKU i cena (rozdzielone tabulatorem lub średnikiem), po jednej pozycji w linii. Aktualizuje ceny dla wszystkich stanowisk naraz.</p>
+      <textarea id="cennikArea" placeholder="GUE06-ZPR\t6,39
+GUE06-ZPR-14GW\t9,29"></textarea>
+      <div style="margin-top:8px;"><button class="nav" onclick="applyCennik()">Zastosuj cennik</button>
+      <span id="cennikMsg" class="hint"></span></div></div>`;
+  } else if(view==='uwagi'){
+    html += `<div class="card"><h3>Uwagi — ${esc(stationName(currentStation))}</h3>
+      <p class="hint">Wolne notatki dotyczące tej konkretnej konfiguracji (np. ustalenia z klientem, odstępstwa od standardu).</p>
+      <textarea id="uwagiArea" oninput="notes[${cs}]=this.value; saveNotes(${cs});">${esc(notes[currentStation]||'')}</textarea>
+    </div>`;
+  } else if(view==='kosz'){
+    const h = hiddenSet();
+    const list = BASE_CATALOG.filter(i=>h.has(i.code));
+    html += `<div class="card"><h3>Kosz — usunięte produkty (${list.length})</h3>
+      <p class="hint">Produkty z katalogu bazowego, które zostały usunięte. Możesz je przywrócić.</p>
+      <table><thead><tr><th>Kod</th><th>Nazwa</th><th>Kategoria</th><th></th></tr></thead><tbody>
+      ${list.map(i=>`<tr><td class="code">${esc(itemCode(i))}</td><td>${esc(itemName(i))}</td><td>${esc(effStage(i))}</td>
+        <td><button class="small" onclick="restoreItem(${js(i.code)})">Przywróć</button></td></tr>`).join('')}
+      </tbody></table>
+      ${list.length?`<div style="margin-top:12px;"><button class="nav secondary" onclick="restoreAll()">Przywróć wszystkie</button></div>`:''}</div>`;
+  } else if(view==='summary'){
+    html += `<div class="card"><h3>Podsumowanie — ${esc(stationName(currentStation))}</h3>`;
+    let gt=0;
+    stagesList.forEach(st=>{
+      const t = stageTotal(currentStation, st);
+      if(t>0){ gt+=t; html += `<div class="summary-row"><span>${esc(st)}</span><b>${money(t)}</b></div>`; }
+    });
+    html += `<div class="summary-row" style="border-top:2px solid var(--accent); margin-top:8px; font-size:16px;"><span>RAZEM</span><b>${money(gt)}</b></div>`;
+    if(notes[currentStation]){ html += `<div style="margin-top:14px;"><b>Uwagi:</b><p style="white-space:pre-wrap;">${esc(notes[currentStation])}</p></div>`; }
+    html += `<div style="margin-top:14px;"><button class="nav secondary" onclick="window.print()">Drukuj / eksportuj do PDF</button></div></div>`;
+  } else if(!currentStage){
+    html += `<div class="card"><h3>Brak kategorii</h3><p class="hint">Dodaj pierwszą kategorię przyciskiem „+ kategoria”.</p></div>`;
+  } else {
+    const items = allItems().filter(i=>effStage(i)===currentStage);
+    const st = js(currentStage);
+    html += `<div class="card"><div class="card-head"><h3>${esc(currentStage)}</h3>
+        <span class="no-print"><button class="small" onclick="renameStage(${st})">✎ Zmień nazwę</button>
+        <button class="small warn" onclick="deleteStage(${st})">✕ Usuń kategorię</button></span></div>
+      <div class="table-wrap"><table><thead><tr><th></th><th>Kod</th><th>Nazwa</th><th>Kategoria</th><th>Ilość</th><th>Cena</th><th>Wartość</th><th></th></tr></thead>
+      <tbody>${items.map(i=>itemRow(currentStation,i,stagesList)).join('') || `<tr><td colspan="8" class="hint">Brak produktów w tej kategorii — dodaj je poniżej.</td></tr>`}</tbody></table></div>
+      <div class="subtotal">Suma etapu: ${money(stageTotal(currentStation,currentStage))}</div>
+      <div class="addform no-print">
+        <input type="text" id="newName" placeholder="Nazwa nowego produktu">
+        <input type="text" id="newCode" class="code-in" placeholder="Kod (opcjonalnie)">
+        <input type="number" id="newQty" placeholder="Ilość" value="1" min="0">
+        <input type="number" id="newPrice" placeholder="Cena" step="0.01" min="0">
+        <button class="nav secondary" onclick="addCustomItem(${cs},${st})">+ Dodaj do tej kategorii</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Modal do edycji kategorii -->
-  <div id="editCategoryModal" class="modal-overlay">
-    <div class="modal-content">
-      <h3>Zmień kategorię</h3>
-      <input id="editCategoryInput" type="text" placeholder="Nowa nazwa kategorii" />
-      <div class="modal-buttons">
-        <button class="secondary-btn" onclick="closeEditCategoryModal()">Anuluj</button>
-        <button class="nav-btn" onclick="saveEditCategory()">Zapisz</button>
+      <div class="navrow no-print">
+        <button class="nav secondary" onclick="prevStage()">← Poprzedni etap</button>
+        <button class="nav" onclick="nextStage()">Następny etap →</button>
       </div>
-    </div>
-  </div>
-
-  <script>
-    const STATIONS = [2, 3, 4, 5, 6];
-    const STORAGE_VERSION = 'ekowash-v3';
-
-    const BASE_CATALOG = [
-      { code: 'GUE06-ZPR', name: 'GUEST 6mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
-      { code: 'GUE08-ZPR', name: 'GUEST 8mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
-      { code: 'GUE12-ZPR', name: 'GUEST 12mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
-      { code: 'GUE22-ZPR', name: 'GUEST 22mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
-      { code: 'LAN60-PRO-SZE', name: 'Lanca prosta 60cm', stage: '3. Lance, pistolety, dysze' },
-      { code: 'LAN70-ZAG-ZLO', name: 'Lanca zagięta 70cm', stage: '3. Lance, pistolety, dysze' },
-      { code: 'PIS-ST1100', name: 'Pistolet ST 1100', stage: '3. Lance, pistolety, dysze' },
-      { code: 'DYS-4003', name: 'Dysza LECHLER 4003', stage: '3. Lance, pistolety, dysze' },
-      { code: 'ELE-TRM', name: 'Terminal płatniczy', stage: '5. Elektryka i elektronika' },
-      { code: 'ELE-WRZ', name: 'Wrzutnik monet', stage: '5. Elektryka i elektronika' },
-      { code: 'POM-CAT-350', name: 'Pompa CAT 350', stage: '7. Pompy' },
-      { code: 'POM-HYD', name: 'Pompa Hydroo', stage: '7. Pompy' },
-      { code: 'CHE20-SZA-H', name: 'Szampon Premium Wash', stage: '6. Chemia myjniowa' },
-      { code: 'CHE20-WOS-H', name: 'Wosk Glance Wash', stage: '6. Chemia myjniowa' },
-      { code: 'PAN-KPL', name: 'Panel stanowiska', stage: '4. Panel i pulpit' },
-      { code: 'PAN-DRZ', name: 'Drzwi pulpitu', stage: '4. Panel i pulpit' },
-      { code: 'RWM-STD', name: 'Rozmieniarka standard', stage: '10. Rozmieniarka' },
-      { code: 'WEZ06-STC', name: 'Wą�� stanowiskowy DN6', stage: '2. Węże' },
-      { code: 'WEZ08-STC', name: 'Wąż stanowiskowy DN8', stage: '2. Węże' }
-    ];
-
-    let currentStation = 4;
-    let currentStage = '1. Instalacja hydrauliczna';
-    let view = 'stage';
-    let prices = {};
-    let customItems = [];
-    let stageOverride = {};
-    let extraStages = [];
-    let boms = {};
-    let notes = {};
-    let codeMapping = {}; // Mapowanie starych kodów na nowe
-
-    // Zmienne dla modalów
-    let editingItemCode = null;
-    let editingCategoryName = null;
-
-    function safeStorageGet(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw === null ? fallback : JSON.parse(raw);
-      } catch {
-        return fallback;
-      }
-    }
-
-    function safeStorageSet(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch {
-        // ignore storage write issues
-      }
-    }
-
-    function resetStorageIfNeeded() {
-      const saved = safeStorageGet('ekw_storage_version', null);
-      if (saved !== STORAGE_VERSION) {
-        try {
-          Object.keys(localStorage)
-            .filter(key => key.indexOf('ekw_') === 0 || key === 'ekw_storage_version')
-            .forEach(key => localStorage.removeItem(key));
-        } catch {
-          // ignore if storage not available
-        }
-        safeStorageSet('ekw_storage_version', STORAGE_VERSION);
-      }
-    }
-
-    function allItems() {
-      return BASE_CATALOG.concat(customItems);
-    }
-
-    function effectiveStage(item) {
-      return stageOverride[item.code] || item.stage;
-    }
-
-    function allStages() {
-      const stages = new Set(extraStages);
-      allItems().forEach(item => stages.add(effectiveStage(item)));
-      return [...stages].sort();
-    }
-
-    function loadState() {
-      prices = safeStorageGet('ekw_prices', {});
-      customItems = safeStorageGet('ekw_custom', []);
-      stageOverride = safeStorageGet('ekw_stage_override', {});
-      extraStages = safeStorageGet('ekw_extra_stages', []);
-      codeMapping = safeStorageGet('ekw_code_mapping', {});
-
-      STATIONS.forEach(station => {
-        boms[station] = safeStorageGet('ekw_bom_' + station, {});
-        notes[station] = safeStorageGet('ekw_notes_' + station, '');
-      });
-    }
-
-    function saveState() {
-      safeStorageSet('ekw_prices', prices);
-      safeStorageSet('ekw_custom', customItems);
-      safeStorageSet('ekw_stage_override', stageOverride);
-      safeStorageSet('ekw_extra_stages', extraStages);
-      safeStorageSet('ekw_code_mapping', codeMapping);
-
-      STATIONS.forEach(station => {
-        safeStorageSet('ekw_bom_' + station, boms[station]);
-        safeStorageSet('ekw_notes_' + station, notes[station]);
-      });
-    }
-
-    function getItemEntry(station, code) {
-      const bom = boms[station] || {};
-      if (!bom[code]) bom[code] = { active: false, qty: 0 };
-      return bom[code];
-    }
-
-    function toggleActive(station, code, checked) {
-      const entry = getItemEntry(station, code);
-      entry.active = checked;
-      if (checked && (!entry.qty || entry.qty <= 0)) entry.qty = 1;
-      saveState();
-      render();
-    }
-
-    function setQty(station, code, value) {
-      const entry = getItemEntry(station, code);
-      entry.qty = Number(value) || 0;
-      saveState();
-      render();
-    }
-
-    function setPrice(code, value) {
-      if (value === '') delete prices[code];
-      else prices[code] = Number(value) || 0;
-      saveState();
-      render();
-    }
-
-    function itemValue(station, item) {
-      const entry = getItemEntry(station, item.code);
-      const unitPrice = Number(prices[item.code]) || 0;
-      return entry.active ? (entry.qty || 0) * unitPrice : 0;
-    }
-
-    function stageTotal(station, stageName) {
-      let total = 0;
-      allItems().forEach(item => {
-        if (effectiveStage(item) === stageName) {
-          total += itemValue(station, item);
-        }
-      });
-      return total;
-    }
-
-    function grandTotal(station) {
-      let total = 0;
-      allItems().forEach(item => {
-        total += itemValue(station, item);
-      });
-      return total;
-    }
-
-    function hasStageItems(station, stageName) {
-      return allItems().some(item => effectiveStage(item) === stageName && getItemEntry(station, item.code).active);
-    }
-
-    function moveItem(code, newStage) {
-      if (newStage === '__new__') {
-        const name = prompt('Nazwa nowej kategorii:');
-        if (!name) return;
-        stageOverride[code] = name;
-      } else {
-        stageOverride[code] = newStage;
-      }
-      saveState();
-      render();
-    }
-
-    function addCategory() {
-      const name = prompt('Nazwa nowej kategorii:');
-      if (!name) return;
-      const clean = name.trim();
-      if (!clean) return;
-      if (!extraStages.includes(clean)) extraStages.push(clean);
-      currentStage = clean;
-      view = 'stage';
-      saveState();
-      render();
-    }
-
-    function openEditCategoryModal(oldName) {
-      editingCategoryName = oldName;
-      const input = document.getElementById('editCategoryInput');
-      input.value = oldName;
-      document.getElementById('editCategoryModal').classList.add('active');
-      input.focus();
-    }
-
-    function closeEditCategoryModal() {
-      document.getElementById('editCategoryModal').classList.remove('active');
-      editingCategoryName = null;
-    }
-
-    function saveEditCategory() {
-      const newName = document.getElementById('editCategoryInput').value.trim();
-      if (!newName || newName === editingCategoryName) {
-        closeEditCategoryModal();
-        return;
-      }
-
-      allItems().forEach(item => {
-        if (effectiveStage(item) === editingCategoryName) stageOverride[item.code] = newName;
-      });
-
-      const idx = extraStages.indexOf(editingCategoryName);
-      if (idx >= 0) extraStages[idx] = newName;
-      if (currentStage === editingCategoryName) currentStage = newName;
-      saveState();
-      closeEditCategoryModal();
-      render();
-    }
-
-    function deleteCategory(categoryName) {
-      if (!confirm('Usunąć kategorię "' + categoryName + '"?\n\nProdukty będą przeniesione do kategorii domyślnej.')) return;
-
-      const defaultStage = BASE_CATALOG[0]?.stage || '1. Instalacja hydrauliczna';
-      allItems().forEach(item => {
-        if (effectiveStage(item) === categoryName) delete stageOverride[item.code];
-      });
-
-      const idx = extraStages.indexOf(categoryName);
-      if (idx >= 0) extraStages.splice(idx, 1);
-      if (currentStage === categoryName) currentStage = defaultStage;
-      saveState();
-      render();
-    }
-
-    function openEditCodeModal(code) {
-      editingItemCode = code;
-      const input = document.getElementById('editCodeInput');
-      input.value = code;
-      document.getElementById('editCodeModal').classList.add('active');
-      input.focus();
-      input.select();
-    }
-
-    function closeEditCodeModal() {
-      document.getElementById('editCodeModal').classList.remove('active');
-      editingItemCode = null;
-    }
-
-    function saveEditCode() {
-      const newCode = document.getElementById('editCodeInput').value.trim();
-      if (!newCode || newCode === editingItemCode) {
-        closeEditCodeModal();
-        return;
-      }
-
-      if (allItems().some(item => item.code === newCode)) {
-        alert('Kod "' + newCode + '" już istnieje!');
-        return;
-      }
-
-      // Zaktualizuj kod
-      const item = allItems().find(i => i.code === editingItemCode);
-      if (item) {
-        item.code = newCode;
-        // Przenies cenę
-        if (editingItemCode in prices) {
-          prices[newCode] = prices[editingItemCode];
-          delete prices[editingItemCode];
-        }
-        // Przenies stage override
-        if (editingItemCode in stageOverride) {
-          stageOverride[newCode] = stageOverride[editingItemCode];
-          delete stageOverride[editingItemCode];
-        }
-        // Przenies BOM dla wszystkich stacji
-        STATIONS.forEach(station => {
-          if (boms[station][editingItemCode]) {
-            boms[station][newCode] = boms[station][editingItemCode];
-            delete boms[station][editingItemCode];
-          }
-        });
-        codeMapping[editingItemCode] = newCode;
-        saveState();
-        closeEditCodeModal();
-        render();
-      }
-    }
-
-    function renameStage(oldName) {
-      openEditCategoryModal(oldName);
-    }
-
-    function deleteCustom(code) {
-      if (!confirm('Usunąć tę pozycję?')) return;
-      customItems = customItems.filter(item => item.code !== code);
-      delete prices[code];
-      delete stageOverride[code];
-      STATIONS.forEach(station => {
-        delete boms[station][code];
-      });
-      saveState();
-      render();
-    }
-
-    function addCustomItem(station, stageName) {
-      const nameInput = document.getElementById('newName');
-      const qtyInput = document.getElementById('newQty');
-      const priceInput = document.getElementById('newPrice');
-      const codeInput = document.getElementById('newCode');
-      const name = (nameInput.value || '').trim();
-      const customCode = (codeInput.value || '').trim();
-
-      if (!name) {
-        nameInput.focus();
-        return;
-      }
-
-      const code = customCode || 'WLASNY-' + Date.now();
-      
-      // Sprawdź czy kod już istnieje
-      if (allItems().some(item => item.code === code)) {
-        alert('Kod "' + code + '" już istnieje!');
-        return;
-      }
-
-      customItems.push({ code, name, stage: stageName });
-      prices[code] = Number(priceInput.value) || 0;
-      const entry = getItemEntry(station, code);
-      entry.active = true;
-      entry.qty = Number(qtyInput.value) || 1;
-
-      nameInput.value = '';
-      qtyInput.value = '1';
-      priceInput.value = '';
-      codeInput.value = '';
-      saveState();
-      render();
-    }
-
-    function applyPriceImport() {
-      const area = document.getElementById('cennikArea');
-      const text = area.value || '';
-      let count = 0;
-
-      text.split(/\n/).forEach(line => {
-        const pieces = line.split(/[\t;]/).map(item => item.trim());
-        if (pieces.length >= 2) {
-          const code = pieces[0];
-          const price = Number(String(pieces[1]).replace(',', '.').replace(/[^0-9.]/g, ''));
-          if (code && Number.isFinite(price)) {
-            prices[code] = price;
-            count += 1;
-          }
-        }
-      });
-
-      saveState();
-      document.getElementById('cennikMsg').textContent = 'Zaktualizowano ' + count + ' cen.';
-      render();
-    }
-
-    function renderTabs() {
-      const tabs = STATIONS.map(station => `
-        <button class="tab-btn ${station === currentStation ? 'active' : ''}" onclick="selectStation(${station})">
-          ${station} stanowiska
-        </button>
-      `).join('');
-      document.getElementById('tabs').innerHTML = tabs;
-    }
-
-    function renderStageNavigation() {
-      const stages = allStages();
-      const isExtraStage = extraStages.includes(currentStage);
-      const buttons = stages.map(stageName => {
-        const active = stageName === currentStage && view === 'stage';
-        const done = hasStageItems(currentStation, stageName);
-        const isExtra = extraStages.includes(stageName);
-        return `
-          <span class="stage-chip ${active ? 'active' : ''} ${done ? 'done' : ''}">
-            <span onclick="selectStage('${stageName.replace(/'/g, "\\'")}' )">${stageName}</span>
-            <div class="stage-actions">
-              <button onclick="renameStage('${stageName.replace(/'/g, "\\'")}')" title="Zmień nazwę">✎</button>
-              ${isExtra ? `<button onclick="deleteCategory('${stageName.replace(/'/g, "\\'")}')" title="Usuń kategorię">🗑️</button>` : ''}
-            </div>
-          </span>
-        `;
-      }).join('');
-
-      return `
-        <div class="stage-nav">
-          ${buttons}
-          <button class="small-btn" onclick="addCategory()">+ kategoria</button>
-          <button class="stage-chip ${view === 'cennik' ? 'active' : ''}" onclick="setView('cennik')">💰 Cennik</button>
-          <button class="stage-chip ${view === 'uwagi' ? 'active' : ''}" onclick="setView('uwagi')">📝 Uwagi</button>
-          <button class="stage-chip ${view === 'summary' ? 'active' : ''}" onclick="setView('summary')">📋 Podsumowanie</button>
-        </div>
-      `;
-    }
-
-    function renderStageView() {
-      const stageItems = allItems().filter(item => effectiveStage(item) === currentStage);
-      const rows = stageItems.map(item => {
-        const entry = getItemEntry(currentStation, item.code);
-        const price = prices[item.code] ?? '';
-        const isCustom = item.code.startsWith('WLASNY-');
-        const stageOptions = allStages().map(stageName => `
-          <option value="${stageName}" ${effectiveStage(item) === stageName ? 'selected' : ''}>${stageName}</option>
-        `).join('');
-
-        return `
-          <tr class="${entry.active ? '' : 'inactive'}">
-            <td data-label="Aktywne"><input type="checkbox" ${entry.active ? 'checked' : ''} onchange="toggleActive(${currentStation}, '${item.code}', this.checked)"></td>
-            <td data-label="Kod" class="code" style="cursor: pointer; user-select: none;" onclick="openEditCodeModal('${item.code}');" title="Kliknij, aby edytować">${isCustom ? '✏️ ' : ''}${item.code}</td>
-            <td data-label="Nazwa">${item.name}</td>
-            <td data-label="Kategoria">
-              <select onchange="moveItem('${item.code}', this.value)">
-                ${stageOptions}
-                <option value="__new__">+ nowa kategoria…</option>
-              </select>
-            </td>
-            <td data-label="Ilość"><input class="qty-input" type="number" min="0" step="1" value="${entry.qty || 0}" onchange="setQty(${currentStation}, '${item.code}', this.value)"></td>
-            <td data-label="Cena"><input class="price-input" type="number" min="0" step="0.01" value="${price}" onchange="setPrice('${item.code}', this.value)"></td>
-            <td data-label="Wartość" style="font-weight:700; text-align:right;">${itemValue(currentStation, item).toFixed(2)} zł</td>
-            <td data-label="Usuń">${isCustom ? '<button class="danger" onclick="deleteCustom(\'${item.code}\')">✕</button>' : ''}</td>
-          </tr>
-        `;
-      }).join('');
-
-      return `
-        <div class="card">
-          ${renderStageNavigation()}
-          <h3>${currentStage}</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Aktywne</th>
-                <th>Kod</th>
-                <th>Nazwa</th>
-                <th>Kategoria</th>
-                <th>Ilość</th>
-                <th>Cena</th>
-                <th>Wartość</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-
-          <div class="subtotal">
-            <span>Suma etapu</span>
-            <span>${stageTotal(currentStation, currentStage).toFixed(2)} zł</span>
-          </div>
-
-          <div class="add-form">
-            <input id="newCode" type="text" placeholder="Kod (opcjonalnie)" class="code-input" />
-            <input id="newName" type="text" placeholder="Nazwa produktu" />
-            <input id="newQty" type="number" min="0" value="1" />
-            <input id="newPrice" type="number" min="0" step="0.01" placeholder="Cena" />
-            <button class="secondary-btn" onclick="addCustomItem(${currentStation}, '${currentStage.replace(/'/g, "\\'")}')">+ Dodaj do etapu</button>
-          </div>
-
-          <div style="display:flex; justify-content:space-between; gap:10px; margin-top:18px;">
-            <button class="nav-btn" onclick="prevStage()">← Poprzedni etap</button>
-            <button class="nav-btn" onclick="nextStage()">Następny etap →</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderSummary() {
-      const stages = allStages();
-      let total = 0;
-      const rows = stages.map(stageName => {
-        const val = stageTotal(currentStation, stageName);
-        if (val <= 0) return '';
-        total += val;
-        return `
-          <div class="summary-row">
-            <span>${stageName}</span>
-            <span>${val.toFixed(2)} zł</span>
-          </div>
-        `;
-      }).join('');
-
-      return `
-        <div class="card">
-          ${renderStageNavigation()}
-          <h3>Podsumowanie — stanowisko ${currentStation}</h3>
-          ${rows}
-          <div class="summary-row" style="border-top:2px solid var(--accent); margin-top:10px; padding-top:12px; font-size:16px;">
-            <span>RAZEM</span>
-            <span>${total.toFixed(2)} zł</span>
-          </div>
-          ${notes[currentStation] ? `<div style="margin-top:16px;"><strong>Uwagi:</strong><div style="white-space:pre-wrap; margin-top:6px;">${notes[currentStation]}</div></div>` : ''}
-        </div>
-      `;
-    }
-
-    function renderUwagi() {
-      return `
-        <div class="card">
-          ${renderStageNavigation()}
-          <h3>Uwagi — stanowisko ${currentStation}</h3>
-          <p class="hint">Dodatkowe informacje o tej konfiguracji.</p>
-          <textarea id="notesArea" onchange="notes[currentStation] = this.value; saveState();">${notes[currentStation] || ''}</textarea>
-        </div>
-      `;
-    }
-
-    function renderCennik() {
-      return `
-        <div class="card">
-          ${renderStageNavigation()}
-          <h3>Import cennika</h3>
-          <p class="hint">Wklej kod i cenę w formacie: KOD<TAB>CENA albo KOD;CENA</p>
-          <textarea id="cennikArea" placeholder="GUE06-ZPR\t6,39\nGUE08-ZPR\t8,40"></textarea>
-          <div style="margin-top:12px; display:flex; align-items:center; gap:12px;">
-            <button class="nav-btn" onclick="applyPriceImport()">Zastosuj cennik</button>
-            <span id="cennikMsg" class="hint"></span>
-          </div>
-        </div>
-      `;
-    }
-
-    function render() {
-      renderTabs();
-      let body = '';
-
-      if (view === 'summary') body = renderSummary();
-      else if (view === 'uwagi') body = renderUwagi();
-      else if (view === 'cennik') body = renderCennik();
-      else body = renderStageView();
-
-      document.getElementById('main').innerHTML = body;
-      document.getElementById('grandTotal').textContent = grandTotal(currentStation).toFixed(2) + ' zł';
-      document.getElementById('stageLabel').textContent = 'Stanowisko ' + currentStation + ' • ' + currentStage;
-    }
-
-    function selectStation(station) {
-      currentStation = station;
-      view = 'stage';
-      render();
-    }
-
-    function selectStage(stageName) {
-      currentStage = stageName;
-      view = 'stage';
-      render();
-    }
-
-    function setView(nextView) {
-      view = nextView;
-      render();
-    }
-
-    function prevStage() {
-      const stages = allStages();
-      const index = stages.indexOf(currentStage);
-      if (index > 0) {
-        currentStage = stages[index - 1];
-        render();
-      }
-    }
-
-    function nextStage() {
-      const stages = allStages();
-      const index = stages.indexOf(currentStage);
-      if (index < stages.length - 1) {
-        currentStage = stages[index + 1];
-        render();
-      } else {
-        setView('summary');
-      }
-    }
-
-    resetStorageIfNeeded();
-    loadState();
-    if (!allStages().length) currentStage = '1. Instalacja hydrauliczna';
-    else if (allStages().indexOf(currentStage) === -1) currentStage = allStages()[0];
-    render();
-  </script>
+    </div>`;
+  }
+
+  document.getElementById('main').innerHTML = html;
+  document.getElementById('grandTotal').textContent = money(grandTotal(currentStation));
+  document.getElementById('stageLabel').textContent = view==='summary'?'Podsumowanie':(view==='cennik'?'Cennik':(view==='uwagi'?'Uwagi':(view==='kosz'?'Kosz':(stationName(currentStation)+' • '+(currentStage||'')))));
+}
+
+function selectStation(s){ currentStation=s; view='stage'; render(); }
+function selectStage(st){ currentStage=st; view='stage'; render(); }
+function setView(v){ view=v; render(); }
+function prevStage(){
+  const list = allStages(); const idx = list.indexOf(currentStage);
+  if(idx>0){ currentStage=list[idx-1]; render(); }
+}
+function nextStage(){
+  const list = allStages(); const idx = list.indexOf(currentStage);
+  if(idx<list.length-1){ currentStage=list[idx+1]; render(); } else { setView('summary'); }
+}
+function applyCennik(){
+  const text = document.getElementById('cennikArea').value;
+  const n = parseCennik(text);
+  render();
+  document.getElementById('cennikMsg').textContent = `Zaktualizowano ${n} cen.`;
+}
+
+render();
+</script>
 </body>
 </html>
