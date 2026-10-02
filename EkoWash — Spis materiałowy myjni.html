@@ -134,6 +134,7 @@ const BASE_CATALOG = [
   {"code": "GUE50-ZPR-12GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
   {"code": "GUE50-ZPR-34GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}
 ];
+
 const STATIONS = [2,3,4,5,6];
 let currentStation = 4;
 let view = 'stage';
@@ -156,6 +157,15 @@ function normalizeStageName(stage){
   if(stage === undefined || stage === null || stage === 'undefined' || stage === 'null' || String(stage).trim() === '') return FALLBACK_STAGE;
   return String(stage).trim();
 }
+function restoreBaseCatalogState(){
+  const baseStages = new Set(BASE_CATALOG.map(i => normalizeStageName(i.stage)));
+  const hasBaseStage = [...baseStages].some(s => extraStages.includes(s));
+  if(!hasBaseStage){
+    extraStages = [];
+    BASE_CATALOG.forEach(item => delete stageOverride[item.code]);
+    saveExtra(); saveOverride();
+  }
+}
 function allItems(){ return BASE_CATALOG.concat(customItems); }
 function effStage(item){
   const itemStage = stageOverride[item.code] || item.stage;
@@ -169,6 +179,7 @@ function allStages(){
 function jsString(value){ return String(value).replace(/\\/g,'\\\\').replace(/'/g, "\\'"); }
 function htmlSafe(value){ return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;'); }
 
+restoreBaseCatalogState();
 if(!currentStage || !allStages().includes(currentStage)) currentStage = allStages()[0] || FALLBACK_STAGE;
 
 function saveBom(station){ lsSet('ekw_bom_'+station, boms[station]); }
