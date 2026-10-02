@@ -1,466 +1,657 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>EkoWash — Spis myjni</title>
-<style>
-:root{
-  --bg:#f7f8fa; --card:#ffffff; --text:#1a1d23; --muted:#6b7280;
-  --border:#e3e6ea; --accent:#2e5395; --accent-bg:#eaf0fb;
-  --ok:#1f8a4c; --warn:#c0392b; --header-bg:#2e5395; --header-text:#ffffff;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#14161a; --card:#1c1f26; --text:#e8eaed; --muted:#9aa1ac;
-    --border:#2b2f38; --accent:#6f9ceb; --accent-bg:#1e2a42;
-    --ok:#4fbf7a; --warn:#e0665a; --header-bg:#1c2c4a; --header-text:#eef2fb;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#14161a; --card:#1c1f26; --text:#e8eaed; --muted:#9aa1ac;
-  --border:#2b2f38; --accent:#6f9ceb; --accent-bg:#1e2a42;
-  --ok:#4fbf7a; --warn:#e0665a; --header-bg:#1c2c4a; --header-text:#eef2fb;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;height:100%;}
-body{
-  background:var(--bg); color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-  font-size:14px;
-}
-header{
-  background:var(--header-bg); color:var(--header-text);
-  padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px));
-  position:sticky; top:0; z-index:20;
-}
-header h1{margin:0 0 8px 0; font-size:16px; font-weight:600;}
-.tabs{display:flex; gap:6px; flex-wrap:wrap;}
-.tab-btn{
-  background:rgba(255,255,255,0.12); color:var(--header-text); border:none;
-  padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; font-weight:600;
-}
-.tab-btn.active{background:#fff; color:var(--header-bg);}
-main{max-width:1000px; margin:0 auto; padding:14px; padding-bottom:90px;}
-.card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;}
-.stage-nav{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; align-items:center;}
-.stage-chip{
-  background:var(--card); border:1px solid var(--border); color:var(--text);
-  padding:6px 10px; border-radius:16px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;
-}
-.stage-chip.active{background:var(--accent); color:#fff; border-color:var(--accent);}
-.stage-chip.done{border-color:var(--ok); color:var(--ok);}
-.stage-chip .edit-ic{opacity:0.6; font-size:11px; cursor:pointer; padding:2px 4px;}
-.stage-chip .edit-ic:hover{opacity:1; background:rgba(255,255,255,0.2); border-radius:4px;}
-table{width:100%; border-collapse:collapse; font-size:12.5px;}
-th{text-align:left; color:var(--muted); font-weight:600; padding:6px 4px; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase;}
-td{padding:6px 4px; border-bottom:1px solid var(--border); vertical-align:middle;}
-tr.inactive td{opacity:0.4;}
-.code{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:600;}
-input[type=number]{width:60px; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
-input.price-input{width:75px; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
-input[type=checkbox]{width:16px; height:16px;}
-select.stage-select{font-size:11px; padding:3px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); max-width:120px;}
-.subtotal{text-align:right; font-weight:700; margin-top:10px; font-size:14px;}
-.navrow{display:flex; justify-content:space-between; margin-top:14px; gap:8px;}
-button.nav{
-  background:var(--accent); color:#fff; border:none; padding:10px 18px;
-  border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
-}
-button.nav.secondary{background:var(--accent-bg); color:var(--accent);}
-button.small{background:var(--accent-bg); color:var(--accent); border:none; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer;}
-button.danger{background:transparent; color:var(--warn); border:none; cursor:pointer; font-size:14px;}
-footer.sticky{
-  position:fixed; bottom:0; left:0; right:0; background:var(--card); border-top:1px solid var(--border);
-  padding:10px 14px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
-  display:flex; justify-content:space-between; align-items:center; z-index:20;
-}
-.total-big{font-size:17px; font-weight:800; color:var(--accent);}
-textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);}
-.hint{color:var(--muted); font-size:12px; margin-top:6px;}
-.summary-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:13px;}
-.summary-row b{color:var(--accent);}
-.addform{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); align-items:center;}
-.addform input[type=text]{flex:1; min-width:140px; padding:6px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);}
-.addform input[type=number]{width:80px;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EkoWash — Spis myjni</title>
+  <style>
+    :root {
+      --bg: #f3f5f9;
+      --card: #ffffff;
+      --text: #17212f;
+      --muted: #667085;
+      --border: #dfe5ee;
+      --accent: #2f5aa9;
+      --accent-soft: #eaf1ff;
+      --ok: #1f8a4c;
+      --warn: #c0392b;
+    }
 
-/* Modal styles */
-.modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;}
-.modal.active{display:flex;}
-.modal-content{background:var(--card); border-radius:12px; padding:24px; max-width:400px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.3);}
-.modal-content h2{margin:0 0 16px 0; font-size:18px; color:var(--text);}
-.modal-content p{margin:0 0 16px 0; color:var(--muted); font-size:13px;}
-.modal-content input[type=text]{width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-size:14px; margin-bottom:16px;}
-.modal-actions{display:flex; gap:8px; justify-content:flex-end; margin-top:20px;}
-.modal-actions button{padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
-.modal-actions .btn-primary{background:var(--accent); color:#fff;}
-.modal-actions .btn-secondary{background:var(--accent-bg); color:var(--accent);}
-.modal-actions .btn-danger{background:rgba(192,57,43,0.1); color:var(--warn);}
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
 
-@media print{
-  header,.stage-nav,.navrow,footer.sticky,.no-print,.addform,.modal{display:none !important;}
-  body{background:#fff; color:#000;}
-}
-</style>
+    header {
+      background: var(--accent);
+      color: white;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 { margin: 0 0 10px; font-size: 18px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tab-btn {
+      border: none; border-radius: 8px;
+      background: rgba(255,255,255,0.12);
+      color: white; font-weight: 700; padding: 8px 12px; cursor: pointer;
+    }
+    .tab-btn.active {
+      background: white; color: var(--accent);
+    }
+
+    main {
+      max-width: 1100px; margin: 0 auto;
+      padding: 18px 14px 80px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .stage-nav {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: center; margin-bottom: 14px;
+    }
+
+    .stage-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stage-chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .stage-chip.done {
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+
+    .secondary-btn, .nav-btn, .small-btn {
+      border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
+    }
+    .secondary-btn {
+      background: var(--accent-soft); color: var(--accent); padding: 9px 14px;
+    }
+    .nav-btn {
+      background: var(--accent); color: white; padding: 9px 16px;
+    }
+    .small-btn {
+      background: var(--accent-soft); color: var(--accent); padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 8px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px; text-align: left; vertical-align: middle;
+    }
+    th {
+      color: var(--muted); text-transform: uppercase; font-size: 11px;
+    }
+    tr.inactive td { opacity: 0.45; }
+    .code { font-weight: 700; font-family: Consolas, monospace; }
+    .price-input, input[type=number], input[type=text] {
+      width: 100%; max-width: 110px; padding: 6px 8px;
+      border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--text);
+    }
+    .qty-input { max-width: 70px; }
+    select {
+      width: 100%; max-width: 180px; padding: 6px 8px; border-radius: 6px;
+      border: 1px solid var(--border); background: white; color: var(--text);
+    }
+
+    .subtotal, .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .add-form {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px;
+      padding-top: 16px; border-top: 1px dashed var(--border);
+    }
+    .add-form input[type=text] { min-width: 180px; max-width: none; flex: 1; }
+
+    .sticky-footer {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      background: var(--card); border-top: 1px solid var(--border);
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+      z-index: 20;
+    }
+    .grand-total { font-size: 18px; font-weight: 800; color: var(--accent); }
+
+    textarea {
+      width: 100%; min-height: 140px; padding: 10px; resize: vertical;
+      border: 1px solid var(--border); border-radius: 8px; background: white; color: var(--text);
+      font-family: Consolas, monospace; font-size: 12px;
+    }
+
+    .hint { color: var(--muted); font-size: 12px; }
+    .danger { color: var(--warn); background: transparent; border: none; font-size: 18px; cursor: pointer; }
+
+    @media (max-width: 700px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        border: 1px solid var(--border); border-radius: 10px; background: white;
+        padding: 10px; margin-bottom: 12px; display: block;
+      }
+      td { border: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      td::before {
+        content: attr(data-label);
+        color: var(--muted); font-size: 11px; text-transform: uppercase;
+        font-weight: 700;
+      }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>EkoWash — spis materiałowy myjni</h1>
-  <div class="tabs" id="tabs"></div>
-</header>
-<main id="main"></main>
-<footer class="sticky">
-  <span id="stageLabel" style="color:var(--muted); font-size:12px;"></span>
-  <span class="total-big" id="grandTotal">0,00 zł</span>
-</footer>
+  <header>
+    <h1>EkoWash — Spis myjni</h1>
+    <div id="tabs" class="tabs"></div>
+  </header>
 
-<div class="modal" id="categoryModal">
-  <div class="modal-content">
-    <h2 id="modalTitle">Edytuj kategorię</h2>
-    <p id="modalDesc"></p>
-    <input type="text" id="categoryInput" placeholder="Nazwa kategorii">
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeCategoryModal()">Anuluj</button>
-      <button class="btn-danger" id="deleteBtn" onclick="confirmDeleteCategory()" style="display:none;">Usuń</button>
-      <button class="btn-primary" onclick="saveCategoryEdit()">Zapisz</button>
-    </div>
-  </div>
-</div>
+  <main id="main"></main>
 
-<script>
-const BASE_CATALOG = [{"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta M14x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-18GW", "name": "GUEST 6mm Złączka prosta M18x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-TE", "name": "GUEST 6mm Złączka T", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-TR", "name": "GUEST 6mm Złączka trójnik redukcja", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZAK", "name": "GUEST 6mm Złączka zaślepka", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR", "name": "GUEST 4mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR-14GW", "name": "GUEST 4mm Złączka prosta M14x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZPR-18GW", "name": "GUEST 4mm Złączka prosta M18x1.5 (GWINTEM)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-TE", "name": "GUEST 4mm Złączka T", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-TR", "name": "GUEST 4mm Złączka trójnik redukcja", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE04-ZAK", "name": "GUEST 4mm Złączka zaślepka", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GWINTY-M14-1.5", "name": "Gwinty GU M14x1.5", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GWINTY-M18-1.5", "name": "Gwinty GU M18x1.5", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "POMPA-12V", "name": "Pompa 12V 100W", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "POMPA-24V", "name": "Pompa 24V 100W", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "SILNIK-12V", "name": "Silnik 12V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "SILNIK-24V", "name": "Silnik 24V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "CZUJNIK-TEMP", "name": "Czujnik temperatury DS18B20", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "CZUJNIK-PRZEP", "name": "Czujnik przepływu", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "PRZEK-RELAY-12V", "name": "Przekaźnik/Relay 12V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "PRZEK-RELAY-24V", "name": "Przekaźnik/Relay 24V", "stage": "2. Część hydrauliczna + elektr. (pompy, silniki, czujniki)"}, {"code": "ZAWOREK-ZPOW", "name": "Zawór zwrotny (powietrze)", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ZAWOREK-ZAM", "name": "Zawór zamykający", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-PLASKI", "name": "Rozpylacz płaski", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-STORCZYK", "name": "Rozpylacz storczykowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-MGLA", "name": "Rozpylacz mgła", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-PIANA", "name": "Rozpylacz pianka", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-WIROWY", "name": "Rozpylacz wirowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZPYL-SZCZELINOWY", "name": "Rozpylacz szczelinowy", "stage": "3. Zaworki i rozpylacze (zawory, rozpylacze)"}, {"code": "ROZDZIELACZ", "name": "Rozdzielacz", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-50L", "name": "Zbiornik 50L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-100L", "name": "Zbiornik 100L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-150L", "name": "Zbiornik 150L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "ZBIORNIK-200L", "name": "Zbiornik 200L", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "KRZAN-KULOWY", "name": "Krzan kulowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "FILTR-OBIEGOWY", "name": "Filtr obiegowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "FILTR-PRZYSUCKOWY", "name": "Filtr przysiuckowy", "stage": "4. Rozdzielacz i zbiornik"}, {"code": "GRZALKA-3KW", "name": "Grzałka 3kW", "stage": "5. Grzanie i osuszanie"}, {"code": "GRZALKA-6KW", "name": "Grzałka 6kW", "stage": "5. Grzanie i osuszanie"}, {"code": "GRZALKA-9KW", "name": "Grzałka 9kW", "stage": "5. Grzanie i osuszanie"}, {"code": "TERMOSTAT", "name": "Termostat", "stage": "5. Grzanie i osuszanie"}, {"code": "OSUSZACZ", "name": "Osuszacz", "stage": "5. Grzanie i osuszanie"}, {"code": "SEPARATOR-PARY", "name": "Separator pary", "stage": "5. Grzanie i osuszanie"}, {"code": "RURA-SILIKONOWA", "name": "Rura silikonowa", "stage": "6. Akcesoria i dodatki"}, {"code": "RURA-ELASTYCZNA", "name": "Rura elastyczna", "stage": "6. Akcesoria i dodatki"}, {"code": "ADAPTER-10", "name": "Adapter 10mm", "stage": "6. Akcesoria i dodatki"}, {"code": "ADAPTER-14", "name": "Adapter 14mm", "stage": "6. Akcesoria i dodatki"}, {"code": "SPINKA-METALOWA", "name": "Spinka metalowa do rury", "stage": "6. Akcesoria i dodatki"}, {"code": "USZCZELKA", "name": "Uszczelka", "stage": "6. Akcesoria i dodatki"}, {"code": "OLEJ-BIODEGRADOWALNY", "name": "Olej biodegradowalny", "stage": "6. Akcesoria i dodatki"}, {"code": "OLEJ-MINERALNY", "name": "Olej mineralny", "stage": "6. Akcesoria i dodatki"}];
-const STATIONS = [2,3,4,5,6];
-let currentStation = 4;
-let view = 'stage';
-let currentStage = null;
-let modalMode = null;
-let modalEditName = null;
+  <footer class="sticky-footer">
+    <span id="stageLabel">Stanowisko 4</span>
+    <span id="grandTotal" class="grand-total">0,00 zł</span>
+  </footer>
 
-const STORAGE_VERSION = 'ekowash-v2';
-const storedVersion = localStorage.getItem('ekw_storage_version');
-if (storedVersion !== STORAGE_VERSION) {
-  Object.keys(localStorage)
-    .filter(key => key.indexOf('ekw_') === 0 || key === 'ekw_storage_version')
-    .forEach(key => localStorage.removeItem(key));
-  localStorage.setItem('ekw_storage_version', STORAGE_VERSION);
-}
+  <script>
+    const STATIONS = [2, 3, 4, 5, 6];
+    const STORAGE_VERSION = 'ekowash-v2';
 
-function lsGet(key, fallback){
-  try{ const v = localStorage.getItem(key); return v===null?fallback:JSON.parse(v); }catch(e){ return fallback; }
-}
-function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+    const BASE_CATALOG = [
+      { code: 'GUE06-ZPR', name: 'GUEST 6mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
+      { code: 'GUE08-ZPR', name: 'GUEST 8mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
+      { code: 'GUE12-ZPR', name: 'GUEST 12mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
+      { code: 'GUE22-ZPR', name: 'GUEST 22mm złączka prosta', stage: '1. Instalacja hydrauliczna' },
+      { code: 'LAN60-PRO-SZE', name: 'Lanca prosta 60cm', stage: '3. Lance, pistolety, dysze' },
+      { code: 'LAN70-ZAG-ZLO', name: 'Lanca zagięta 70cm', stage: '3. Lance, pistolety, dysze' },
+      { code: 'PIS-ST1100', name: 'Pistolet ST 1100', stage: '3. Lance, pistolety, dysze' },
+      { code: 'DYS-4003', name: 'Dysza LECHLER 4003', stage: '3. Lance, pistolety, dysze' },
+      { code: 'ELE-TRM', name: 'Terminal płatniczy', stage: '5. Elektryka i elektronika' },
+      { code: 'ELE-WRZ', name: 'Wrzutnik monet', stage: '5. Elektryka i elektronika' },
+      { code: 'POM-CAT-350', name: 'Pompa CAT 350', stage: '7. Pompy' },
+      { code: 'POM-HYD', name: 'Pompa Hydroo', stage: '7. Pompy' },
+      { code: 'CHE20-SZA-H', name: 'Szampon Premium Wash', stage: '6. Chemia myjniowa' },
+      { code: 'CHE20-WOS-H', name: 'Wosk Glance Wash', stage: '6. Chemia myjniowa' },
+      { code: 'PAN-KPL', name: 'Panel stanowiska', stage: '4. Panel i pulpit' },
+      { code: 'PAN-DRZ', name: 'Drzwi pulpitu', stage: '4. Panel i pulpit' },
+      { code: 'RWM-STD', name: 'Rozmieniarka standard', stage: '10. Rozmieniarka' },
+      { code: 'WEZ06-STC', name: 'Wąż stanowiskowy DN6', stage: '2. Węże' },
+      { code: 'WEZ08-STC', name: 'Wąż stanowiskowy DN8', stage: '2. Węże' }
+    ];
 
-let prices = lsGet('ekw_prices', {});
-let customItems = lsGet('ekw_custom', []);
-let stageOverride = lsGet('ekw_stage_override', {});
-let extraStages = lsGet('ekw_extra_stages', []);
-let boms = {}; STATIONS.forEach(s=>boms[s]=lsGet('ekw_bom_'+s, {}));
-let notes = {}; STATIONS.forEach(s=>notes[s]=lsGet('ekw_notes_'+s, ''));
+    let currentStation = 4;
+    let currentStage = '1. Instalacja hydrauliczna';
+    let view = 'stage';
+    let prices = {};
+    let customItems = [];
+    let stageOverride = {};
+    let extraStages = [];
+    let boms = {};
+    let notes = {};
 
-function allItems(){ return BASE_CATALOG.concat(customItems); }
-function effStage(item){ return stageOverride[item.code] || item.stage; }
-function allStages(){
-  const s = new Set(extraStages);
-  allItems().forEach(i=>s.add(effStage(i)));
-  return [...s].sort();
-}
-if(!currentStage) currentStage = allStages()[0];
-
-function saveBom(station){ lsSet('ekw_bom_'+station, boms[station]); }
-function savePrices(){ lsSet('ekw_prices', prices); }
-function saveCustom(){ lsSet('ekw_custom', customItems); }
-function saveOverride(){ lsSet('ekw_stage_override', stageOverride); }
-function saveExtra(){ lsSet('ekw_extra_stages', extraStages); }
-function saveNotes(station){ lsSet('ekw_notes_'+station, notes[station]); }
-
-function itemRow(station, item, stagesList){
-  const bom = boms[station];
-  const rec = bom[item.code] || {active:false, qty:0};
-  const price = prices[item.code] !== undefined ? prices[item.code] : '';
-  const value = (rec.active ? (rec.qty||0) * (parseFloat(price)||0) : 0);
-  const isCustom = item.code.startsWith('WLASNY-');
-  const stageOpts = stagesList.map(s=>`<option value="${s.replace(/"/g,'&quot;')}" ${effStage(item)===s?'selected':''}>${s}</option>`).join('');
-  return `<tr class="${rec.active?'':'inactive'}" data-code="${item.code}">
-    <td><input type="checkbox" ${rec.active?'checked':''} onchange="toggleActive('${station}','${item.code}',this.checked)"></td>
-    <td class="code">${isCustom?'✏️ ':''}${item.code}</td>
-    <td>${item.name}</td>
-    <td><select class="stage-select" onchange="moveItem('${item.code}',this.value)">${stageOpts}<option value="__new__">+ nowa kategoria…</option></select></td>
-    <td><input type="number" min="0" step="1" value="${rec.qty||0}" onchange="setQty('${station}','${item.code}',this.value)"></td>
-    <td><input type="number" min="0" step="0.01" class="price-input" value="${price}" placeholder="—" onchange="setPrice('${item.code}',this.value)"></td>
-    <td style="text-align:right; font-weight:600;">${value.toFixed(2)} zł</td>
-    <td>${isCustom?`<button class="danger" onclick="deleteCustom('${item.code}')" title="Usuń">✕</button>`:''}</td>
-  </tr>`;
-}
-
-function toggleActive(station, code, checked){
-  const bom = boms[station];
-  if(!bom[code]) bom[code] = {active:false, qty:1};
-  bom[code].active = checked;
-  if(checked && !bom[code].qty) bom[code].qty = 1;
-  saveBom(station); render();
-}
-function setQty(station, code, val){
-  const bom = boms[station];
-  if(!bom[code]) bom[code] = {active:true, qty:0};
-  bom[code].qty = parseFloat(val)||0;
-  saveBom(station); render();
-}
-function setPrice(code, val){
-  if(val==='') delete prices[code]; else prices[code] = parseFloat(val);
-  savePrices(); render();
-}
-function moveItem(code, newStage){
-  if(newStage==='__new__'){
-    const name = prompt('Nazwa nowej kategorii:');
-    if(!name) { render(); return; }
-    stageOverride[code] = name;
-  } else {
-    stageOverride[code] = newStage;
-  }
-  saveOverride(); render();
-}
-
-function openEditCategoryModal(oldName){
-  modalMode = 'edit';
-  modalEditName = oldName;
-  document.getElementById('modalTitle').textContent = 'Edytuj kategorię';
-  document.getElementById('modalDesc').textContent = `Zmień nazwę: "${oldName}"`;
-  document.getElementById('categoryInput').value = oldName;
-  document.getElementById('deleteBtn').style.display = 'block';
-  document.getElementById('categoryModal').classList.add('active');
-  setTimeout(() => document.getElementById('categoryInput').focus(), 100);
-}
-
-function openAddCategoryModal(){
-  modalMode = 'add';
-  modalEditName = null;
-  document.getElementById('modalTitle').textContent = 'Nowa kategoria';
-  document.getElementById('modalDesc').textContent = 'Wpisz nazwę nowej kategorii';
-  document.getElementById('categoryInput').value = '';
-  document.getElementById('deleteBtn').style.display = 'none';
-  document.getElementById('categoryModal').classList.add('active');
-  setTimeout(() => document.getElementById('categoryInput').focus(), 100);
-}
-
-function closeCategoryModal(){
-  document.getElementById('categoryModal').classList.remove('active');
-  modalMode = null;
-  modalEditName = null;
-}
-
-function saveCategoryEdit(){
-  const newName = document.getElementById('categoryInput').value.trim();
-  if(!newName){
-    alert('Nazwa kategorii nie może być pusta');
-    document.getElementById('categoryInput').focus();
-    return;
-  }
-
-  if(modalMode === 'edit'){
-    const oldName = modalEditName;
-    if(newName === oldName){
-      closeCategoryModal();
-      return;
+    function safeStorageGet(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch {
+        return fallback;
+      }
     }
-    allItems().forEach(i=>{ if(effStage(i)===oldName) stageOverride[i.code] = newName; });
-    const ei = extraStages.indexOf(oldName);
-    if(ei>-1){ extraStages[ei] = newName; saveExtra(); }
-    saveOverride();
-    if(currentStage===oldName) currentStage = newName;
-  } else if(modalMode === 'add'){
-    if(extraStages.includes(newName)){
-      alert('Kategoria o tej nazwie już istnieje');
-      return;
+
+    function safeStorageSet(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {
+        // ignore storage write issues
+      }
     }
-    extraStages.push(newName);
-    saveExtra();
-    currentStage = newName;
-    view = 'stage';
-  }
 
-  closeCategoryModal();
-  render();
-}
-
-function confirmDeleteCategory(){
-  const oldName = modalEditName;
-  if(!confirm(`Usunąć kategorię "${oldName}"?\n\nWszystkie pozycje z tej kategorii nie będą usunięte, ale zostaną przypisane do domyślnych kategorii.`)){
-    return;
-  }
-
-  const ei = extraStages.indexOf(oldName);
-  if(ei>-1){
-    extraStages.splice(ei, 1);
-    saveExtra();
-  }
-
-  const itemsToUpdate = allItems().filter(i=>effStage(i)===oldName);
-  itemsToUpdate.forEach(i=>{
-    if(stageOverride[i.code]) delete stageOverride[i.code];
-  });
-  saveOverride();
-
-  if(currentStage === oldName){
-    currentStage = allStages()[0] || 'Brak';
-  }
-
-  closeCategoryModal();
-  render();
-}
-
-function addCustomItem(station, stage){
-  const nameEl = document.getElementById('newName');
-  const qtyEl = document.getElementById('newQty');
-  const priceEl = document.getElementById('newPrice');
-  const name = nameEl.value.trim();
-  if(!name){ nameEl.focus(); return; }
-  const qty = parseFloat(qtyEl.value)||1;
-  const price = parseFloat(priceEl.value)||0;
-  const code = 'WLASNY-' + Date.now();
-  customItems.push({code, name, stage});
-  prices[code] = price;
-  if(!boms[station][code]) boms[station][code] = {active:true, qty:qty};
-  saveCustom(); savePrices(); saveBom(station);
-  nameEl.value = ''; qtyEl.value = '1'; priceEl.value = '';
-  render();
-}
-function deleteCustom(code){
-  if(!confirm('Usunąć tę pozycję ze spisu?')) return;
-  customItems = customItems.filter(i=>i.code!==code);
-  delete prices[code];
-  delete stageOverride[code];
-  STATIONS.forEach(s=>{ delete boms[s][code]; saveBom(s); });
-  saveCustom(); savePrices(); saveOverride();
-  render();
-}
-
-function stageTotal(station, stage){
-  const bom = boms[station]; let t=0;
-  allItems().filter(i=>effStage(i)===stage).forEach(i=>{
-    const rec = bom[i.code];
-    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
-  });
-  return t;
-}
-function grandTotal(station){
-  const bom = boms[station]; let t=0;
-  allItems().forEach(i=>{
-    const rec = bom[i.code];
-    if(rec && rec.active) t += (rec.qty||0) * (parseFloat(prices[i.code])||0);
-  });
-  return t;
-}
-function stageHasItems(stage, station){
-  const bom = boms[station];
-  return allItems().filter(i=>effStage(i)===stage).some(i=> bom[i.code] && bom[i.code].active);
-}
-function parseCennik(text){
-  const lines = text.split(/\n/); let updated=0;
-  lines.forEach(line=>{
-    const parts = line.split(/\t|;/).map(s=>s.trim());
-    if(parts.length>=2){
-      const code = parts[0];
-      const p = parseFloat(parts[1].replace(',', '.').replace(/[^0-9.]/g,''));
-      if(code && !isNaN(p)){ prices[code]=p; updated++; }
+    function resetStorageIfNeeded() {
+      const saved = safeStorageGet('ekw_storage_version', null);
+      if (saved !== STORAGE_VERSION) {
+        try {
+          Object.keys(localStorage)
+            .filter(key => key.indexOf('ekw_') === 0 || key === 'ekw_storage_version')
+            .forEach(key => localStorage.removeItem(key));
+        } catch {
+          // ignore if storage not available
+        }
+        safeStorageSet('ekw_storage_version', STORAGE_VERSION);
+      }
     }
-  });
-  savePrices();
-  return updated;
-}
 
-function render(){
-  const stagesList = allStages();
-  document.getElementById('tabs').innerHTML = STATIONS.map(s=>
-    `<button class="tab-btn ${s===currentStation?'active':''}" onclick="selectStation(${s})">${s} stanowiska</button>`
-  ).join('');
+    function allItems() {
+      return BASE_CATALOG.concat(customItems);
+    }
 
-  let html = '<div class="stage-nav no-print">';
-  stagesList.forEach(st=>{
-    const active = (st===currentStage && view==='stage');
-    const done = stageHasItems(st, currentStation);
-    const isExtra = extraStages.includes(st);
-    html += `<span class="stage-chip ${active?'active':''} ${done?'done':''}">
-      <span onclick="selectStage('${st.replace(/'/g,"\\'")}')">${st}</span>
-      <span class="edit-ic" onclick="openEditCategoryModal('${st.replace(/'/g,"\\'")}')" title="Edytuj kategorię">✎</span>
-      ${isExtra?`<span class="edit-ic" onclick="deleteCategoryQuick('${st.replace(/'/g,"\\'")}')" title="Usuń kategorię">✕</span>`:''}
-    </span>`;
-  });
-  html += `<button class="small" onclick="openAddCategoryModal()">+ kategoria</button>`;
-  html += `<button class="stage-chip ${view==='cennik'?'active':''}" onclick="setView('cennik')">💰 Cennik</button>`;
-  html += `<button class="stage-chip ${view==='uwagi'?'active':''}" onclick="setView('uwagi')">📝 Uwagi</button>`;
-  html += `<button class="stage-chip ${view==='summary'?'active':''}" onclick="setView('summary')">📋 Podsumowanie</button>`;
-  html += `</div>`;
+    function effectiveStage(item) {
+      return stageOverride[item.code] || item.stage;
+    }
 
-  if(view==='cennik'){
-    html += `<div class="card"><h3>Wklej cennik z wFirma</h3>
-      <p class="hint">Wklej dwie kolumny: kod SKU i cena (rozdzielone tabulatorem lub średnikiem), po jednej pozycji w linii. Aktualizuje ceny dla wszystkich zakładek naraz.</p>
-      <textarea id="cennikArea" placeholder="GUE06-ZPR	6,39
-GUE06-ZPR-14GW	9,29"></textarea>
-      <div style="margin-top:8px;"><button class="nav" onclick="applyCennik()">Zastosuj cennik</button>
-      <span id="cennikMsg" class="hint"></span></div></div>`;
-  } else if(view==='uwagi'){
-    html += `<div class="card"><h3>Uwagi — ${currentStation} stanowiska</h3>
-      <p class="hint">Wolne notatki dotyczące tej konkretnej konfiguracji (np. ustalenia z klientem, odstępstwa od standardu).</p>
-      <textarea id="uwagiArea" oninput="notes[${currentStation}]=this.value; saveNotes(${currentStation});">${notes[currentStation]||''}</textarea>
-    </div>`;
-  } else if(view==='summary'){
-    html += `<div class="card"><h3>Podsumowanie — ${currentStation} stanowiska</h3>`;
-    let gt=0;
-    stagesList.forEach(st=>{
-      const t = stageTotal(currentStation, st);
-      if(t>0){ gt+=t; html += `<div class="summary-row"><span>${st}</span><b>${t.toFixed(2)} zł</b></div>`; }
-    });
-    html += `<div class="summary-row" style="border-top:2px solid var(--accent); margin-top:8px; font-size:16px;"><span>RAZEM</span><b>${gt.toFixed(2)} zł</b></div>`;
-    if(notes[currentStation]){ html += `<div style="margin-top:14px;"><b>Uwagi:</b><p style="white-space:pre-wrap;">${notes[currentStation]}</p></div>`; }
-    html += `<div style="margin-top:14px;"><button class="nav secondary" onclick="window.print()">Drukuj / eksportuj do PDF</button></div></div>`;
-  } else {
-    const items = allItems().filter(i=>effStage(i)===currentStage);
-    html += `<div class="card"><h3>${currentStage}</h3>
-      <table><thead><tr><th></th><th>Kod</th><th>Nazwa</th><th>Kategoria</th><th>Ilość</th><th>Cena</th><th>Wartość</th><th></th></tr></thead>
-      <tbody>${items.map(i=>itemRow(currentStation,i,stagesList)).join('')}</tbody></table>
-      <div class="subtotal">Suma etapu: ${stageTotal(currentStation,currentStage).toFixed(2)} zł</div>
-      <div class="addform no-print">
-        <input type="text" id="newName" placeholder="Nazwa własnego produktu">
-        <input type="number" id="newQty" placeholder="Ilość" value="1" min="0">
-        <input type="number" id="newPrice" placeholder="Cena" step="0.01" min="0">
-        <button class="nav secondary" onclick="addCustomItem('${currentStation}','${currentStage.replace(/'/g,"\\'")}')">+ Dodaj do tej kategorii</button>
-      </div>
-      <div class="navrow no-print">
-        <button class="nav secondary" onclick="prevStage()">← Poprzedni etap</button>
-        <button class="nav" onclick="nextStage()">Następny etap →</button>
-      </div>
-    </div>`;
-  }
+    function allStages() {
+      const stages = new Set(extraStages);
+      allItems().forEach(item => stages.add(effectiveStage(item)));
+      return [...stages].sort();
+    }
 
-  document.getElementById('main').innerHTML = html;
-  document.getElementById('grandTotal').textContent = grandTotal(currentStation).toFixed(2)+' zł';
-  document.getElementById('stageLabel').textContent = view==='summary'?'Podsumowanie':(view==='cennik'?'Cennik':(view==='uwagi'?'Uwagi':(currentStation+' stanowiska • '+currentStage)));
-}
+    function loadState() {
+      prices = safeStorageGet('ekw_prices', {});
+      customItems = safeStorageGet('ekw_custom', []);
+      stageOverride = safeStorageGet('ekw_stage_override', {});
+      extraStages = safeStorageGet('ekw_extra_stages', []);
 
-function selectStation(s){ currentStation=s; view='stage'; render(); }
-function selectStage(st){ currentStage=st; view='stage'; render(); }
-function setView(v){ view=v; render(); }
-function prevStage(){
-  const list = allStages(); const idx = list.indexOf(currentStage);
-  if(idx>0){ currentStage=list[idx-1]; render(); }
-}
-function nextStage(){
-  const list = allStages(); const idx = list.indexOf(currentStage);
-  if(idx<list.length-1){ currentStage=list[idx+1]; render(); } else { setView('summary'); }
-}
-function applyCennik(){
-  const text = document.getElementById('cennikArea').value;
-  const n = parseCennik(text);
-  document.getElementById('cennikMsg').textContent = `Zaktualizowano ${n} cen.`;
-  render();
-}
+      STATIONS.forEach(station => {
+        boms[station] = safeStorageGet('ekw_bom_' + station, {});
+        notes[station] = safeStorageGet('ekw_notes_' + station, '');
+      });
+    }
 
-function deleteCategoryQuick(name){
-  openEditCategoryModal(name);
-}
+    function saveState() {
+      safeStorageSet('ekw_prices', prices);
+      safeStorageSet('ekw_custom', customItems);
+      safeStorageSet('ekw_stage_override', stageOverride);
+      safeStorageSet('ekw_extra_stages', extraStages);
 
-render();
-</script>
+      STATIONS.forEach(station => {
+        safeStorageSet('ekw_bom_' + station, boms[station]);
+        safeStorageSet('ekw_notes_' + station, notes[station]);
+      });
+    }
+
+    function getItemEntry(station, code) {
+      const bom = boms[station] || {};
+      if (!bom[code]) bom[code] = { active: false, qty: 0 };
+      return bom[code];
+    }
+
+    function toggleActive(station, code, checked) {
+      const entry = getItemEntry(station, code);
+      entry.active = checked;
+      if (checked && (!entry.qty || entry.qty <= 0)) entry.qty = 1;
+      saveState();
+      render();
+    }
+
+    function setQty(station, code, value) {
+      const entry = getItemEntry(station, code);
+      entry.qty = Number(value) || 0;
+      saveState();
+      render();
+    }
+
+    function setPrice(code, value) {
+      if (value === '') delete prices[code];
+      else prices[code] = Number(value) || 0;
+      saveState();
+      render();
+    }
+
+    function itemValue(station, item) {
+      const entry = getItemEntry(station, item.code);
+      const unitPrice = Number(prices[item.code]) || 0;
+      return entry.active ? (entry.qty || 0) * unitPrice : 0;
+    }
+
+    function stageTotal(station, stageName) {
+      let total = 0;
+      allItems().forEach(item => {
+        if (effectiveStage(item) === stageName) {
+          total += itemValue(station, item);
+        }
+      });
+      return total;
+    }
+
+    function grandTotal(station) {
+      let total = 0;
+      allItems().forEach(item => {
+        total += itemValue(station, item);
+      });
+      return total;
+    }
+
+    function hasStageItems(station, stageName) {
+      return allItems().some(item => effectiveStage(item) === stageName && getItemEntry(station, item.code).active);
+    }
+
+    function moveItem(code, newStage) {
+      if (newStage === '__new__') {
+        const name = prompt('Nazwa nowej kategorii:');
+        if (!name) return;
+        stageOverride[code] = name;
+      } else {
+        stageOverride[code] = newStage;
+      }
+      saveState();
+      render();
+    }
+
+    function addCategory() {
+      const name = prompt('Nazwa nowej kategorii:');
+      if (!name) return;
+      const clean = name.trim();
+      if (!clean) return;
+      if (!extraStages.includes(clean)) extraStages.push(clean);
+      currentStage = clean;
+      view = 'stage';
+      saveState();
+      render();
+    }
+
+    function renameStage(oldName) {
+      const newName = prompt('Nowa nazwa kategorii:', oldName);
+      if (!newName || !newName.trim()) return;
+      const clean = newName.trim();
+      if (clean === oldName) return;
+
+      allItems().forEach(item => {
+        if (effectiveStage(item) === oldName) stageOverride[item.code] = clean;
+      });
+
+      const idx = extraStages.indexOf(oldName);
+      if (idx >= 0) extraStages[idx] = clean;
+      if (currentStage === oldName) currentStage = clean;
+      saveState();
+      render();
+    }
+
+    function deleteCustom(code) {
+      if (!confirm('Usunąć tę pozycję?')) return;
+      customItems = customItems.filter(item => item.code !== code);
+      delete prices[code];
+      delete stageOverride[code];
+      STATIONS.forEach(station => {
+        delete boms[station][code];
+      });
+      saveState();
+      render();
+    }
+
+    function addCustomItem(station, stageName) {
+      const nameInput = document.getElementById('newName');
+      const qtyInput = document.getElementById('newQty');
+      const priceInput = document.getElementById('newPrice');
+      const name = (nameInput.value || '').trim();
+      if (!name) {
+        nameInput.focus();
+        return;
+      }
+
+      const code = 'WLASNY-' + Date.now();
+      customItems.push({ code, name, stage: stageName });
+      prices[code] = Number(priceInput.value) || 0;
+      const entry = getItemEntry(station, code);
+      entry.active = true;
+      entry.qty = Number(qtyInput.value) || 1;
+
+      nameInput.value = '';
+      qtyInput.value = '1';
+      priceInput.value = '';
+      saveState();
+      render();
+    }
+
+    function applyPriceImport() {
+      const area = document.getElementById('cennikArea');
+      const text = area.value || '';
+      let count = 0;
+
+      text.split(/\n/).forEach(line => {
+        const pieces = line.split(/[\t;]/).map(item => item.trim());
+        if (pieces.length >= 2) {
+          const code = pieces[0];
+          const price = Number(String(pieces[1]).replace(',', '.').replace(/[^0-9.]/g, ''));
+          if (code && Number.isFinite(price)) {
+            prices[code] = price;
+            count += 1;
+          }
+        }
+      });
+
+      saveState();
+      document.getElementById('cennikMsg').textContent = 'Zaktualizowano ' + count + ' cen.';
+      render();
+    }
+
+    function renderTabs() {
+      const tabs = STATIONS.map(station => `
+        <button class="tab-btn ${station === currentStation ? 'active' : ''}" onclick="selectStation(${station})">
+          ${station} stanowiska
+        </button>
+      `).join('');
+      document.getElementById('tabs').innerHTML = tabs;
+    }
+
+    function renderStageNavigation() {
+      const stages = allStages();
+      const buttons = stages.map(stageName => {
+        const active = stageName === currentStage && view === 'stage';
+        const done = hasStageItems(currentStation, stageName);
+        return `
+          <span class="stage-chip ${active ? 'active' : ''} ${done ? 'done' : ''}">
+            <span onclick="selectStage('${stageName.replace(/'/g, "\\'")}' )">${stageName}</span>
+            <span onclick="renameStage('${stageName.replace(/'/g, "\\'")}')" title="Zmień nazwę">✎</span>
+          </span>
+        `;
+      }).join('');
+
+      return `
+        <div class="stage-nav">
+          ${buttons}
+          <button class="small-btn" onclick="addCategory()">+ kategoria</button>
+          <button class="stage-chip ${view === 'cennik' ? 'active' : ''}" onclick="setView('cennik')">💰 Cennik</button>
+          <button class="stage-chip ${view === 'uwagi' ? 'active' : ''}" onclick="setView('uwagi')">📝 Uwagi</button>
+          <button class="stage-chip ${view === 'summary' ? 'active' : ''}" onclick="setView('summary')">📋 Podsumowanie</button>
+        </div>
+      `;
+    }
+
+    function renderStageView() {
+      const stageItems = allItems().filter(item => effectiveStage(item) === currentStage);
+      const rows = stageItems.map(item => {
+        const entry = getItemEntry(currentStation, item.code);
+        const price = prices[item.code] ?? '';
+        const isCustom = item.code.startsWith('WLASNY-');
+        const stageOptions = allStages().map(stageName => `
+          <option value="${stageName}" ${effectiveStage(item) === stageName ? 'selected' : ''}>${stageName}</option>
+        `).join('');
+
+        return `
+          <tr class="${entry.active ? '' : 'inactive'}">
+            <td data-label="Aktywne"><input type="checkbox" ${entry.active ? 'checked' : ''} onchange="toggleActive(${currentStation}, '${item.code}', this.checked)"></td>
+            <td data-label="Kod" class="code">${isCustom ? '✏️ ' : ''}${item.code}</td>
+            <td data-label="Nazwa">${item.name}</td>
+            <td data-label="Kategoria">
+              <select onchange="moveItem('${item.code}', this.value)">
+                ${stageOptions}
+                <option value="__new__">+ nowa kategoria…</option>
+              </select>
+            </td>
+            <td data-label="Ilość"><input class="qty-input" type="number" min="0" step="1" value="${entry.qty || 0}" onchange="setQty(${currentStation}, '${item.code}', this.value)"></td>
+            <td data-label="Cena"><input class="price-input" type="number" min="0" step="0.01" value="${price}" onchange="setPrice('${item.code}', this.value)"></td>
+            <td data-label="Wartość" style="font-weight:700; text-align:right;">${itemValue(currentStation, item).toFixed(2)} zł</td>
+            <td data-label="Usuń">${isCustom ? '<button class="danger" onclick="deleteCustom(\'${item.code}\')">✕</button>' : ''}</td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="card">
+          ${renderStageNavigation()}
+          <h3>${currentStage}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Aktywne</th>
+                <th>Kod</th>
+                <th>Nazwa</th>
+                <th>Kategoria</th>
+                <th>Ilość</th>
+                <th>Cena</th>
+                <th>Wartość</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+
+          <div class="subtotal">
+            <span>Suma etapu</span>
+            <span>${stageTotal(currentStation, currentStage).toFixed(2)} zł</span>
+          </div>
+
+          <div class="add-form">
+            <input id="newName" type="text" placeholder="Nazwa własnego produktu" />
+            <input id="newQty" type="number" min="0" value="1" />
+            <input id="newPrice" type="number" min="0" step="0.01" placeholder="Cena" />
+            <button class="secondary-btn" onclick="addCustomItem(${currentStation}, '${currentStage.replace(/'/g, "\\'")}')">+ Dodaj do etapu</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:10px; margin-top:18px;">
+            <button class="nav-btn" onclick="prevStage()">← Poprzedni etap</button>
+            <button class="nav-btn" onclick="nextStage()">Następny etap →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSummary() {
+      const stages = allStages();
+      let total = 0;
+      const rows = stages.map(stageName => {
+        const val = stageTotal(currentStation, stageName);
+        if (val <= 0) return '';
+        total += val;
+        return `
+          <div class="summary-row">
+            <span>${stageName}</span>
+            <span>${val.toFixed(2)} zł</span>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="card">
+          ${renderStageNavigation()}
+          <h3>Podsumowanie — stanowisko ${currentStation}</h3>
+          ${rows}
+          <div class="summary-row" style="border-top:2px solid var(--accent); margin-top:10px; padding-top:12px; font-size:16px;">
+            <span>RAZEM</span>
+            <span>${total.toFixed(2)} zł</span>
+          </div>
+          ${notes[currentStation] ? `<div style="margin-top:16px;"><strong>Uwagi:</strong><div style="white-space:pre-wrap; margin-top:6px;">${notes[currentStation]}</div></div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderUwagi() {
+      return `
+        <div class="card">
+          ${renderStageNavigation()}
+          <h3>Uwagi — stanowisko ${currentStation}</h3>
+          <p class="hint">Dodatkowe informacje o tej konfiguracji.</p>
+          <textarea id="notesArea" onchange="notes[currentStation] = this.value; saveState();">${notes[currentStation] || ''}</textarea>
+        </div>
+      `;
+    }
+
+    function renderCennik() {
+      return `
+        <div class="card">
+          ${renderStageNavigation()}
+          <h3>Import cennika</h3>
+          <p class="hint">Wklej kod i cenę w formacie: KOD<TAB>CENA albo KOD;CENA</p>
+          <textarea id="cennikArea" placeholder="GUE06-ZPR\t6,39\nGUE08-ZPR\t8,40"></textarea>
+          <div style="margin-top:12px; display:flex; align-items:center; gap:12px;">
+            <button class="nav-btn" onclick="applyPriceImport()">Zastosuj cennik</button>
+            <span id="cennikMsg" class="hint"></span>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      renderTabs();
+      let body = '';
+
+      if (view === 'summary') body = renderSummary();
+      else if (view === 'uwagi') body = renderUwagi();
+      else if (view === 'cennik') body = renderCennik();
+      else body = renderStageView();
+
+      document.getElementById('main').innerHTML = body;
+      document.getElementById('grandTotal').textContent = grandTotal(currentStation).toFixed(2) + ' zł';
+      document.getElementById('stageLabel').textContent = 'Stanowisko ' + currentStation + ' • ' + currentStage;
+    }
+
+    function selectStation(station) {
+      currentStation = station;
+      view = 'stage';
+      render();
+    }
+
+    function selectStage(stageName) {
+      currentStage = stageName;
+      view = 'stage';
+      render();
+    }
+
+    function setView(nextView) {
+      view = nextView;
+      render();
+    }
+
+    function prevStage() {
+      const stages = allStages();
+      const index = stages.indexOf(currentStage);
+      if (index > 0) {
+        currentStage = stages[index - 1];
+        render();
+      }
+    }
+
+    function nextStage() {
+      const stages = allStages();
+      const index = stages.indexOf(currentStage);
+      if (index < stages.length - 1) {
+        currentStage = stages[index + 1];
+        render();
+      } else {
+        setView('summary');
+      }
+    }
+
+    resetStorageIfNeeded();
+    loadState();
+    if (!allStages().length) currentStage = '1. Instalacja hydrauliczna';
+    else if (allStages().indexOf(currentStage) === -1) currentStage = allStages()[0];
+    render();
+  </script>
 </body>
 </html>
