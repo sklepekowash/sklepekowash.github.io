@@ -204,9 +204,11 @@ function jsString(value){
 }
 
 function isCorruptedState(){
-  const validBaseStages = new Set(BASE_CATALOG.map(i => normalizeStageName(i.stage)));
-  const currentStages = (Array.isArray(extraStages) ? extraStages : []).map(normalizeStageName);
-  return currentStages.length > 0 && !currentStages.some(s => validBaseStages.has(s));
+  if (!Array.isArray(extraStages)) return true;
+  return extraStages.some(stage => {
+    const value = stage === undefined || stage === null ? '' : String(stage).trim();
+    return value === '' || value === 'undefined' || value === 'null';
+  });
 }
 
 if (isCorruptedState()) {
@@ -238,7 +240,7 @@ function itemRow(station, item, stagesList){
     <td>
       <div class="row-actions">
         <button class="small" onclick="editProduct('${item.code}')" title="Edytuj produkt">✎</button>
-        ${isCustom ? `<button class="danger" onclick="deleteCustom('${item.code}')" title="Usuń produkt z katalogu">✕</button>` : `<button class="danger" onclick="softDeleteProduct('${station}','${item.code}')" title="Ukryj produkt z tego stanowiska">🗑</button>`}
+        ${isCustom ? `<button class="danger" onclick="deleteCustom('${item.code}')" title="Usuń produkt z katalogu">✕</button>` : `<button class="danger" onclick="softDeleteProduct('${station}','${item.code}')" title="Ukryj produkt w tym stanowisku">✕</button>`}
       </div>
     </td>
   </tr>`;
@@ -511,7 +513,7 @@ function selectStage(st){ currentStage = st; view = 'stage'; render(); }
 function setView(v){ view = v; render(); }
 function prevStage(){ const list = allStages(); const idx = list.indexOf(currentStage); if (idx > 0) currentStage = list[idx - 1]; render(); }
 function nextStage(){ const list = allStages(); const idx = list.indexOf(currentStage); if (idx < list.length - 1) currentStage = list[idx + 1]; else setView('summary'); }
-function applyCennik(){ const text = document.getElementById('cennikArea').value; const count = parseCennik(text); document.getElementById('cennikMsg').textContent = `Zaktualizowano ${count} cen.`; render(); }
+function applyCennik(){ const text = document.getElementById('cennikArea').value; const count = parseCennik(text); document.getElementById('cennikMsg').textContent = `Zaktualizowano ${count} cen.`; }
 
 render();
 </script>
