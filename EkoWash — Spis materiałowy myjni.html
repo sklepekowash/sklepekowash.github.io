@@ -102,11 +102,43 @@ textarea{width:100%; min-height:140px; font-family:ui-monospace,Menlo,Consolas,m
 </footer>
 
 <script>
-const BASE_CATALOG = [{"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE06-ZPR-12GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR", "name": "GUEST 8mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR-12GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE08-ZPR-34GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZPR", "name": "GUEST 10mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZPR-12GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE10-ZPR-34GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR", "name": "GUEST 12mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR-12GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE12-ZPR-34GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE16-ZPR", "name": "GUEST 16mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE16-ZPR-12GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE16-ZPR-34GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE20-ZPR", "name": "GUEST 20mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE20-ZPR-12GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE20-ZPR-34GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE25-ZPR", "name": "GUEST 25mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE25-ZPR-12GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE25-ZPR-34GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE32-ZPR", "name": "GUEST 32mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE32-ZPR-12GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE32-ZPR-34GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE40-ZPR", "name": "GUEST 40mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE40-ZPR-12GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE40-ZPR-34GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE50-ZPR", "name": "GUEST 50mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE50-ZPR-12GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}, {"code": "GUE50-ZPR-34GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}];
+const BASE_CATALOG = [
+  {"code": "GUE06-ZPR", "name": "GUEST 6mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE06-ZPR-14GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE06-ZPR-12GW", "name": "GUEST 6mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE08-ZPR", "name": "GUEST 8mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE08-ZPR-12GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE08-ZPR-34GW", "name": "GUEST 8mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE10-ZPR", "name": "GUEST 10mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE10-ZPR-12GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE10-ZPR-34GW", "name": "GUEST 10mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE12-ZPR", "name": "GUEST 12mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE12-ZPR-12GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE12-ZPR-34GW", "name": "GUEST 12mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE16-ZPR", "name": "GUEST 16mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE16-ZPR-12GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE16-ZPR-34GW", "name": "GUEST 16mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE20-ZPR", "name": "GUEST 20mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE20-ZPR-12GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE20-ZPR-34GW", "name": "GUEST 20mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE25-ZPR", "name": "GUEST 25mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE25-ZPR-12GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE25-ZPR-34GW", "name": "GUEST 25mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE32-ZPR", "name": "GUEST 32mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE32-ZPR-12GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE32-ZPR-34GW", "name": "GUEST 32mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE40-ZPR", "name": "GUEST 40mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE40-ZPR-12GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE40-ZPR-34GW", "name": "GUEST 40mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE50-ZPR", "name": "GUEST 50mm Złączka prosta (bez gwintu)", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE50-ZPR-12GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 1/2", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"},
+  {"code": "GUE50-ZPR-34GW", "name": "GUEST 50mm Złączka prosta (bez gwintu) 3/4", "stage": "1. Instalacja hydrauliczna (złączki, gwinty)"}
+];
 const STATIONS = [2,3,4,5,6];
 let currentStation = 4;
 let view = 'stage';
 let currentStage = null;
+const FALLBACK_STAGE = 'Inne';
 
 function lsGet(key, fallback){
   try{ const v = localStorage.getItem(key); return v===null?fallback:JSON.parse(v); }catch(e){ return fallback; }
@@ -120,17 +152,24 @@ let extraStages = lsGet('ekw_extra_stages', []);
 let boms = {}; STATIONS.forEach(s=>boms[s]=lsGet('ekw_bom_'+s, {}));
 let notes = {}; STATIONS.forEach(s=>notes[s]=lsGet('ekw_notes_'+s, ''));
 
+function normalizeStageName(stage){
+  if(stage === undefined || stage === null || stage === 'undefined' || stage === 'null' || String(stage).trim() === '') return FALLBACK_STAGE;
+  return String(stage).trim();
+}
 function allItems(){ return BASE_CATALOG.concat(customItems); }
-function effStage(item){ return stageOverride[item.code] || item.stage; }
+function effStage(item){
+  const itemStage = stageOverride[item.code] || item.stage;
+  return normalizeStageName(itemStage);
+}
 function allStages(){
-  const s = new Set(extraStages);
+  const s = new Set(extraStages.map(normalizeStageName));
   allItems().forEach(i=>s.add(effStage(i)));
-  return [...s].sort();
+  return [...s].sort((a,b)=>String(a).localeCompare(String(b), 'pl'));
 }
 function jsString(value){ return String(value).replace(/\\/g,'\\\\').replace(/'/g, "\\'"); }
 function htmlSafe(value){ return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-if(!currentStage || !allStages().includes(currentStage)) currentStage = allStages()[0] || '';
+if(!currentStage || !allStages().includes(currentStage)) currentStage = allStages()[0] || FALLBACK_STAGE;
 
 function saveBom(station){ lsSet('ekw_bom_'+station, boms[station]); }
 function savePrices(){ lsSet('ekw_prices', prices); }
@@ -208,7 +247,7 @@ function removeStage(stageName){
     alert('Ta kategoria jest wbudowana i nie może zostać usunięta. Możesz tylko zmienić jej nazwę lub przenieść pozycje.');
     return;
   }
-  const fallback = allStages().filter(s=>s!==stageName)[0] || 'Inne';
+  const fallback = allStages().filter(s=>s!==stageName)[0] || FALLBACK_STAGE;
   if(!confirm(`Ukryć kategorię "${stageName}"? Produkty zostaną zachowane, ale przeniesione do kategorii "${fallback}".`)) return;
 
   allItems().forEach(i=>{ if(effStage(i)===stageName) stageOverride[i.code] = fallback; });
